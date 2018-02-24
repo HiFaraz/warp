@@ -31,6 +31,10 @@ namespace cluster {
   namespace threads {
     std::vector<std::thread> list{std::thread::hardware_concurrency()};
 
+    std::thread::id get_id() {
+      return std::this_thread::get_id();
+    }
+
     void launch(std::function<void()> task) {
       console::log("Launching " + std::to_string(list.size()) + " threads");
 
