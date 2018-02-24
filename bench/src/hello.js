@@ -3,23 +3,15 @@ const http = require('http');
 const numCPUs = require('os').cpus().length;
 
 if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
-
-  // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
   }
-
   cluster.on('exit', (worker, code, signal) => {
     console.log(`worker ${worker.process.pid} died`);
+    cluster.fork();
   });
 } else {
   // Workers can share any TCP connection
   // In this case it is an HTTP server
-  http.createServer((req, res) => {
-    res.writeHead(200);
-    res.end('Hello world\n');
-  }).listen(8081);
-
-  console.log(`Worker ${process.pid} started`);
+  http.createServer((req, res) => res.end('Hello world')).listen(process.env.PORT);
 }

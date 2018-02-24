@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+##
+# Utility code
+##
+
+CLEAR='\033[0m'
+BOLD='\033[1m'
+UNDERLINE='\033[4m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+
+function write() {
+  echo -e "$@${CLEAR}"
+}
+
+##
+# Main section
+##
+
+echo
+write $BOLD "\bPhoton micro-benchmark\n"
+
+# setup: clean build
+write $UNDERLINE "\bCleaning"
+rm build/*
+rm bin/*
+write $UNDERLINE "\bCompiling\n"
+make
+
+if [ $? -eq 0 ];then
+  # benchmark
+  echo
+  export PORT=8080
+  write $UNDERLINE "\bBenchmarking"
+  echo
+  bin/photon &
+  sleep 0.5
+  echo
+  wrk -t12 -c1000 -d10s http://localhost:8080
+
+  # teardown
+  echo
+  write $UNDERLINE "\bCleaning up"
+  echo
+  pgrep photon | xargs kill
+  echo
+  write $GREEN $BOLD "\b\bFinished"
+  echo
+fi

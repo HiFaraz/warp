@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+##
+# Utility code
+##
+
+CLEAR='\033[0m'
+BOLD='\033[1m'
+UNDERLINE='\033[4m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+
+function write() {
+  echo -e "$@${CLEAR}"
+}
+
+##
+# Main section
+##
+
+echo
+write $BOLD "\bGo micro-benchmark\n"
+
+if [ $? -eq 0 ];then
+  # benchmark
+  export PORT=8082
+  write $UNDERLINE "\bBenchmarking"
+  go run bench/src/hello.go &
+  sleep 0.5
+  echo
+  wrk -t12 -c1000 -d10s http://localhost:8082
+
+  # teardown
+  echo
+  write $UNDERLINE "\bCleaning up"
+  echo
+  pgrep hello | xargs kill
+  echo
+  write $GREEN $BOLD "\b\bFinished"
+  echo
+fi
