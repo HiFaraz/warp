@@ -7,16 +7,20 @@
 #include "console.h" // import console
 #include "event-loop.h" // import EventLoop
 #include "polly.h" // import Polly
-#include "socket.h" // import Socket
+#include "socket.h" // import ServerSocket
+
+using client_event_callback_t = std::function<void(int)>;
 
 constexpr int MAX_EVENTS = 100000;
 
 class Server {
+
   private:
-    std::function<void(Socket)> client_event_cb;
-    Polly                       client_poller{MAX_EVENTS};
-    Polly                       server_poller;
-    Socket                      server_socket;
+    client_event_callback_t client_event_cb;
+    int                     event_count;
+    int                     event_index;
+    Polly                   poller{MAX_EVENTS};
+    ServerSocket            server_socket;
 
   public:
     ~Server() {
@@ -25,44 +29,34 @@ class Server {
     }
 
     Server(EventLoop &event_loop) {
-      client_poller.set_event_loop(event_loop);
-      server_poller.set_event_loop(event_loop);
-
-      server_poller.add(server_socket.get_fd());
-      server_poller.on_event([this](int fd, uint32_t events_mask) -> void {
-        // epoll has triggered a server event
-        // means one or more incoming connections
-        // accept them all and add to epoll
+      event_loop.push_poll([this]() -> void {
+        // accept new connections
+        // instead of accepting only when triggered by epoll, this
+        // tries at least one accept each loop. However it avoids a conditional
+        // check if the poller event is for the server. This is a good trade-off
+        // for a server under heavy load with short-lived connections
         while(true) {
           try {
-            Socket client_socket = server_socket.accept();
-            client_poller.add(client_socket.get_fd());
+            int client_fd = server_socket.accept();
+            poller.add(client_fd);
           } catch (...) {
             break;
           }
         }
-      });
-      client_poller.on_event([this](int fd, uint32_t events_mask) -> void {
-        // client event, call the callback
-        // TODO: spawn a thread? or use the complex event loop threading like libuv/Node.js?
-        // TODO how to remove from epoll when connection closed?
-        Socket client_socket{fd};
-        client_event_cb(client_socket);
+
+        // process client events
+        event_count = poller.wait();
+        for (event_index = 0; event_index < event_count; ++event_index) {
+          client_event_cb(poller.events[event_index].data.fd);
+        }
       });
     }
-    // std::vector<void (*)()> requestListeners;
-
-    // void on(std::string event, void (*listener)()) {
-    //   if (event == "request") {
-    //     requestListeners.push_back(listener);
-    //   }
-    // }
 
     void listen(int port) {
       server_socket.listen(port);
     }
 
-    void on_client_event(std::function<void(Socket)> listener) {
+    void on_client_event(client_event_callback_t listener) {
       client_event_cb = listener;
     }
 };

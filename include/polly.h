@@ -21,16 +21,15 @@
 constexpr int NON_BLOCKING_TIMEOUT = 0;
 
 class Polly {
+
   private:
-    std::function<void(int, uint32_t)> event_cb;
-    int                                     event_count;
-    int                                     event_index;
-    struct epoll_event *                    events;
-    int                                     fd;
-    int                                     max_events;
-    int                                     timeout;
+    int                   fd;
+    int                   max_events;
+    int                   timeout;
   
   public:
+    struct epoll_event *  events;
+    
     Polly(int max_events, int timeout) {
       fd = epoll_create1(0);
     
@@ -49,9 +48,6 @@ class Polly {
 
     // timeout is set to NON_BLOCKING_TIMEOUT if not provided
     Polly(int max_events) : Polly(max_events, NON_BLOCKING_TIMEOUT) {};
-
-    // max_events is set to 1 if not provided
-    Polly(): Polly(1) {};
 
     ~Polly() {
       close();
@@ -75,32 +71,12 @@ class Polly {
       }
     }
 
-    void on_event(std::function<void(int, uint32_t)> listener) {
-      event_cb = listener;
-    }
-
-    void set_event_loop(EventLoop &event_loop) {
-      event_loop.push_poll([this, &event_loop]() -> void { wait_and_callback(event_loop); });
-    }
-
     int wait() {
-      return epoll_wait(fd, events, max_events, timeout);
-    }
-
-    void wait_and_callback(EventLoop &event_loop) {
-      event_count = wait();
-
-      if (event_count == -1) {
+      int count = epoll_wait(fd, events, max_events, timeout);
+      if (count == -1) {
         throw std::runtime_error{"Polly failed to wait for an I/O event"};
       }
-
-      for (event_index = 0; event_index < event_count; ++event_index) {
-        // int fd = events[event_index].data.fd;
-        // uint32_t events_mask = events[event_index].events;
-        event_cb(events[event_index].data.fd, events[event_index].events);
-        // event_loop.push_poll_callback([this, &events_mask, &fd]() -> void {
-        // });
-      }
+      return count;
     }
 };
 

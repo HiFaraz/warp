@@ -1,8 +1,6 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-// #include <iostream>
-
 #include <cstring> // import memset
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -18,26 +16,11 @@
 #include "console.h" // import console
 
 class Socket {
-  private:
+
+  protected:
     struct sockaddr_in  address;
     int                 fd;
     bool                is_bound = false;
-
-    void create_socket() {
-      fd = socket(PF_INET, SOCK_STREAM, 0);
-      if (fd == -1) {
-        throw std::runtime_error{"create_socket"};
-      }
-    }
-
-    void init_address() {
-      // partially initialize address
-      // host is assumed to be any unless overridden by connect()
-      // port is provided through bind() or connect()
-      memset(&address, 0, sizeof(address));
-      address.sin_addr.s_addr = htonl(INADDR_ANY);
-      address.sin_family = AF_INET;
-    }
 
     void set_non_blocking() {
       bool err = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK) == -1;
@@ -60,24 +43,77 @@ class Socket {
     }
   
   public:
-    Socket() {
+    // TODO catch errors in ::close
+    int close() {
+      return ::close(fd);
+    }
+
+    int get_fd() {
+      return fd;
+    }
+
+    // good code, disabled because we don't need it
+    // bool is_blocking() {
+    //   return !(fcntl(fd, F_GETFL) & O_NONBLOCK);
+    // }
+
+    void shutdownAll() {
+      shutdown(SHUT_RDWR);
+    }
+    
+    void shutdownIncoming() {
+      shutdown(SHUT_WR);
+    }
+
+    void shutdownOutgoing() {
+      shutdown(SHUT_WR);
+    }
+};
+
+class ClientSocket : public Socket {
+
+  public:
+    ClientSocket(int socket_fd) {
+      this->fd = socket_fd;
+      set_non_blocking();
+    }
+
+    ssize_t recv(char* buffer, ssize_t bufferSize) {
+      return ::recv(fd, buffer, bufferSize, 0);
+    }
+
+    ssize_t send(char* buffer, ssize_t bufferSize) {
+      return ::send(fd, buffer, bufferSize, 0);
+    }
+};
+
+class ServerSocket : public Socket {
+
+  protected:
+    void create_socket() {
+      fd = socket(PF_INET, SOCK_STREAM, 0);
+      if (fd == -1) {
+        throw std::runtime_error{"create_socket"};
+      }
+    }
+
+    void init_address() {
+      // partially initialize address
+      // host is assumed to be any unless overridden by connect()
+      // port is provided through bind() or connect()
+      memset(&address, 0, sizeof(address));
+      address.sin_addr.s_addr = htonl(INADDR_ANY);
+      address.sin_family = AF_INET;
+    }
+
+  public:
+    ServerSocket() {
       create_socket();
       init_address();
       set_non_blocking();
     }
 
-    Socket(int socket_fd) {
-      this->fd = socket_fd;
-      set_non_blocking();
-    }
-
-    // Socket (int id, SocketOptions options) : Socket(id) {
-    //   if (!options.blocking) {
-    //     this->set_non_blocking();
-    //   }
-    // }
-
-    Socket accept() {
+    int accept() {
       struct sockaddr_storage clientAddress; // sockaddr_storage supports both IPv4 and IPv6
       socklen_t clientAddressLength = sizeof(clientAddress);
       
@@ -87,10 +123,7 @@ class Socket {
         throw std::runtime_error{"accept failed"};
       }
 
-      // SocketOptions connectionOptions;
-      // connectionOptions.blocking = false;
-      // return Socket {connectionId, connectionOptions};
-      return Socket{connectionId};
+      return connectionId;
     }
 
     void bind(int port) {
@@ -113,19 +146,6 @@ class Socket {
       is_bound = true;
     }
 
-    // TODO catch errors in ::close
-    int close() {
-      return ::close(fd);
-    }
-
-    int get_fd() {
-      return fd;
-    }
-
-    bool is_blocking() {
-      return !(fcntl(fd, F_GETFL) & O_NONBLOCK);
-    }
-
     void listen() {
       bool err = ::listen(fd, SOMAXCONN) == -1;
       if (err) {
@@ -139,26 +159,6 @@ class Socket {
         bind(port);
       }
       listen();
-    }
-
-    ssize_t recv(char* buffer, ssize_t bufferSize) {
-      return ::recv(fd, buffer, bufferSize, 0);
-    }
-
-    ssize_t send(char* buffer, ssize_t bufferSize) {
-      return ::send(fd, buffer, bufferSize, 0);
-    }
-
-    void shutdownAll() {
-      shutdown(SHUT_RDWR);
-    }
-    
-    void shutdownIncoming() {
-      shutdown(SHUT_WR);
-    }
-
-    void shutdownOutgoing() {
-      shutdown(SHUT_WR);
     }
 };
 

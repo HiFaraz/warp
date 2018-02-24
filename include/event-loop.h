@@ -10,6 +10,7 @@
 using callback = std::function<void()>;
 
 class EventLoop {
+  
   private:
     bool                  running = false;
     std::vector<callback> polls;

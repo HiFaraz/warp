@@ -1,4 +1,4 @@
-CC := g++ -std=c++11 # This is the main compiler
+CC := g++ -std=c++11 -O2 # This is the main compiler
 # CC := clang --analyze # and comment out the linker last line for sanity
 SRCDIR := src
 BUILDDIR := build
@@ -7,7 +7,7 @@ TARGET := bin/server
 SRCEXT := cc
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g # -Wall
+CFLAGS :=  # -Wall
 LIB := -pthread -L lib
 INC := -I include
 STD := "-std=c++11"
