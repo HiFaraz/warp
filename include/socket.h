@@ -35,12 +35,12 @@ class Socket {
       address.sin_port = htons(port);
     }
 
-    void shutdown(int how) {
-      bool err = ::shutdown(fd, how) == -1;
-      if (err) {
-        throw std::runtime_error{"::shutdown failed"};
-      }
-    }
+    // void shutdown(int how) {
+    //   bool err = ::shutdown(fd, how) == -1;
+    //   if (err) {
+    //     throw std::runtime_error{"::shutdown failed"};
+    //   }
+    // }
   
   public:
     // TODO catch errors in ::close
@@ -57,17 +57,17 @@ class Socket {
     //   return !(fcntl(fd, F_GETFL) & O_NONBLOCK);
     // }
 
-    void shutdownAll() {
-      shutdown(SHUT_RDWR);
-    }
+    // void shutdownAll() {
+    //   shutdown(SHUT_RDWR);
+    // }
     
-    void shutdownIncoming() {
-      shutdown(SHUT_WR);
-    }
+    // void shutdownIncoming() {
+    //   shutdown(SHUT_WR);
+    // }
 
-    void shutdownOutgoing() {
-      shutdown(SHUT_WR);
-    }
+    // void shutdownOutgoing() {
+    //   shutdown(SHUT_WR);
+    // }
 };
 
 class ClientSocket : public Socket {

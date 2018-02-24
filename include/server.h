@@ -24,7 +24,7 @@ class Server {
 
   public:
     ~Server() {
-      server_socket.shutdownIncoming();
+      // server_socket.shutdownIncoming();
       server_socket.close();
     }
 
@@ -35,6 +35,8 @@ class Server {
         // tries at least one accept each loop. However it avoids a conditional
         // check if the poller event is for the server. This is a good trade-off
         // for a server under heavy load with short-lived connections
+        // I have tested disabling the loop, but it seems to allow ~10% more
+        // requests per second
         while(true) {
           try {
             int client_fd = server_socket.accept();
@@ -47,6 +49,7 @@ class Server {
         // process client events
         event_count = poller.wait();
         for (event_index = 0; event_index < event_count; ++event_index) {
+          // TODO check for client hangup or closing of the write stream
           client_event_cb(poller.events[event_index].data.fd);
         }
       });
