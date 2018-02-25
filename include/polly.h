@@ -18,7 +18,7 @@
  * with its destructor method.
  */
 
-constexpr int NON_BLOCKING_TIMEOUT = 0;
+constexpr int BLOCKING_TIMEOUT = -1;
 
 class Polly {
 
@@ -46,8 +46,8 @@ class Polly {
       this->max_events = max_events;
     }
 
-    // timeout is set to NON_BLOCKING_TIMEOUT if not provided
-    Polly(int max_events) : Polly(max_events, NON_BLOCKING_TIMEOUT) {};
+    // timeout is set to BLOCKING_TIMEOUT if not provided
+    Polly(int max_events) : Polly(max_events, BLOCKING_TIMEOUT) {};
 
     ~Polly() {
       close();
