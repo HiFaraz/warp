@@ -45,6 +45,18 @@ namespace cluster {
 
       task(); // from the master thread
     }
+
+    void launch(std::function<void()> task, std::size_t num_threads) {
+      console::log("Launching " + std::to_string(num_threads) + " threads");
+      list = std::vector<std::thread>{num_threads};
+
+      // create n-1 threads (use the master thread too)
+      for(unsigned index = 1; index < list.size(); ++index) {
+          list[index] = std::thread(task);
+      }
+
+      task(); // from the master thread
+    }
   }
 
 }
