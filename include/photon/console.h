@@ -1,5 +1,5 @@
-#ifndef CONSOLE_H
-#define CONSOLE_H
+#ifndef PHOTON_CONSOLE_H
+#define PHOTON_CONSOLE_H
 
 #include <iostream>
 
@@ -15,4 +15,4 @@ namespace console {
   }
 }
 
-#endif // !CONSOLE_H
+#endif // !PHOTON_CONSOLE_H

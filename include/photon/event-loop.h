@@ -1,5 +1,5 @@
-#ifndef EVENT_LOOP_H
-#define EVENT_LOOP_H
+#ifndef PHOTON_EVENT_LOOP_H
+#define PHOTON_EVENT_LOOP_H
 
 #include <functional> // import std::function
 #include <vector> // import std::vector
@@ -39,4 +39,4 @@ class EventLoop {
     }
 };
 
-#endif // !EVENT_LOOP_H
+#endif // !PHOTON_EVENT_LOOP_H

@@ -1,5 +1,5 @@
-#ifndef POLLY_H
-#define POLLY_H
+#ifndef PHOTON_NET_POLLY_H
+#define PHOTON_NET_POLLY_H
 
 #include <functional> // import std::function
 #include <new> // import std::nothrow
@@ -7,7 +7,7 @@
 #include <sys/epoll.h> // import epoll_create1, epoll_ctl, epoll_event
 #include <unistd.h> // import close
 
-#include "event-loop.h" // import EventLoop
+#include "photon.h" // import EventLoop
 
 /**
  * Polly is a class for using epoll with the Socket class
@@ -88,4 +88,4 @@ class Polly {
     }
 };
 
-#endif // !POLLY_H
+#endif // !PHOTON_NET_POLLY_H

@@ -1,5 +1,5 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#ifndef PHOTON_NET_SOCKET_H
+#define PHOTON_NET_SOCKET_H
 
 #include <cstring> // import memset
 #include <sys/types.h>
@@ -13,7 +13,7 @@
 // #include <cerrno> // for errno
 // #include <errno.h>
 
-#include "console.h" // import console
+#include "photon.h" // import console
 
 class Socket {
 
@@ -162,58 +162,4 @@ class ServerSocket : public Socket {
     }
 };
 
-#endif // !SOCKET_H
-
-// /**
-//  * Not happy with this code just yet
-//  * Meant to receive the complete message, but not sure if that's needed
-//  */
-// ssize_t Zreceive(char* buffer, ssize_t bufferSizeLimit) {
-//   return; // disable this function from actually doing anything until I'm happy with this code
-//   // std::cout << "socket receive" << std::endl;
-//   // if (blocking) {
-//   //   // blocking sockets should only read/recv once
-//   //   // std::cout << "Blocking read" << std::endl;
-//   //   return recv(fd, buffer, bufferSizeLimit, 0);
-//   // }
-
-//   // non-blocking socket, keep receiving until buffer is full
-  
-//   ssize_t bufferSize = 0;
-//   ssize_t bufferSizeMax = bufferSizeLimit - 1;
-//   const int MAX_TRIES = 3;
-//   int tries = 0;
-
-//   while(bufferSize < bufferSizeMax) {
-//       ssize_t chunkSize = ::recv(fd, buffer + bufferSize, bufferSizeLimit - bufferSize, MSG_DONTWAIT);
-//       // std::cout << "socket recv " << chunkSize << " bytes" << std::endl;
-//       if (chunkSize == -1) {
-//         // std::cout << "errno " << errno << std::endl;
-//         // if (errno == EAGAIN) {
-//         //   std::cout << "EAGAIN" << std::endl;
-//         // } else if (errno == EWOULDBLOCK) {
-//         //   std::cout << "EWOULDBLOCK" << std::endl;
-//         // }
-        
-//         if (bufferSize == 0) {
-//           if (tries == MAX_TRIES) {
-//             return -1;
-//           } else {
-//             tries++;
-//             break;
-//           }
-//         } else {
-//           break;
-//         }
-//       } else if (chunkSize == 0) {
-//         break;
-//       }
-//       bufferSize += chunkSize;
-//   }
-
-//   if (bufferSize != -1) {
-//     buffer[bufferSize] = '\0';
-//   }
-
-//   return bufferSize;
-// }
+#endif // !PHOTON_NET_SOCKET_H

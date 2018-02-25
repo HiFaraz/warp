@@ -1,5 +1,5 @@
-#ifndef CLUSTER_H
-#define CLUSTER_H
+#ifndef PHOTON_CLUSTER_H
+#define PHOTON_CLUSTER_H
 
 #include <functional> // import std::function
 #include <thread> // import std::thread
@@ -61,4 +61,4 @@ namespace cluster {
 
 }
 
-#endif // !CLUSTER_H
+#endif // !PHOTON_CLUSTER_H
