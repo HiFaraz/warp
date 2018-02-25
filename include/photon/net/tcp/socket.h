@@ -1,5 +1,5 @@
-#ifndef PHOTON_NET_SOCKET_H
-#define PHOTON_NET_SOCKET_H
+#ifndef PHOTON_NET_TCP_SOCKET_H
+#define PHOTON_NET_TCP_SOCKET_H
 
 #include <cstring> // import memset
 #include <sys/types.h>
@@ -13,7 +13,7 @@
 // #include <cerrno> // for errno
 // #include <errno.h>
 
-#include "photon.h" // import console
+#include "photon/console.h"
 
 namespace tcp {
 
@@ -177,4 +177,4 @@ namespace tcp {
 
 }
 
-#endif // !PHOTON_NET_SOCKET_H
+#endif // !PHOTON_NET_TCP_SOCKET_H
