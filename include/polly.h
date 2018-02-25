@@ -23,7 +23,7 @@ constexpr int BLOCKING_TIMEOUT = -1;
 class Polly {
 
   private:
-    int                   fd;
+    int                   poller_fd;
     int                   max_events;
     int                   timeout;
   
@@ -31,9 +31,9 @@ class Polly {
     struct epoll_event *  events;
     
     Polly(int max_events, int timeout) {
-      fd = epoll_create1(0);
+      poller_fd = epoll_create1(0);
     
-      if(fd == -1) {
+      if(poller_fd == -1) {
         throw std::runtime_error{"Polly failed to create its file descriptor"};
       }
 
@@ -53,11 +53,13 @@ class Polly {
       close();
     }
 
-    void add(int new_fd) {
+    void add(int fd) {
       struct epoll_event event;
+      event.data.fd = fd;
       event.data.fd = new_fd;
       event.events = EPOLLIN;
       bool err = epoll_ctl(fd, EPOLL_CTL_ADD, new_fd, &event) == -1;
+      bool err = epoll_ctl(poller_fd, EPOLL_CTL_ADD, fd, &event) == -1;
       if (err) {
         close();
         throw std::runtime_error{"Polly failed to add a file descriptor to epoll"};
@@ -65,14 +67,14 @@ class Polly {
     }
 
     void close() {
-      int err = ::close(fd) == -1;
+      int err = ::close(poller_fd) == -1;
       if (err) {
         throw std::runtime_error{"Polly failed to close its file descriptor"};
       }
     }
 
     int wait() {
-      int count = epoll_wait(fd, events, max_events, timeout);
+      int count = epoll_wait(poller_fd, events, max_events, timeout);
       if (count == -1) {
         throw std::runtime_error{"Polly failed to wait for an I/O event"};
       }
