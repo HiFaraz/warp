@@ -1,9 +1,8 @@
-#include <cstdlib> // import std::getenv
 #include <functional> // import std::function
 #include <iostream>
 #include <string>
 
-#include "console.h" // import console
+#include "env.h" // import env (namespace)
 #include "event-loop.h" // import EventLoop
 #include "cluster.h" // import cluster (namespace)
 #include "server.h" // import Server, ClientSocket
@@ -40,11 +39,7 @@ void start_server() {
   // server.on("request", []() -> void { std::cout << "New request\n"; });
   server.on_client_event(on_client_event);
 
-  int port = 8080;
-  char const* env_port = std::getenv("PORT");
-  if (env_port != NULL) {
-    port = std::stoi(env_port);
-  }
+  int port = env::get_int("PORT", 8080);
   server.listen(port);
   console::log("Listening on port " + std::to_string(port));
   
