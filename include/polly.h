@@ -56,9 +56,7 @@ class Polly {
     void add(int fd) {
       struct epoll_event event;
       event.data.fd = fd;
-      event.data.fd = new_fd;
-      event.events = EPOLLIN;
-      bool err = epoll_ctl(fd, EPOLL_CTL_ADD, new_fd, &event) == -1;
+      event.events = EPOLLIN|EPOLLET;
       bool err = epoll_ctl(poller_fd, EPOLL_CTL_ADD, fd, &event) == -1;
       if (err) {
         close();
@@ -70,6 +68,14 @@ class Polly {
       int err = ::close(poller_fd) == -1;
       if (err) {
         throw std::runtime_error{"Polly failed to close its file descriptor"};
+      }
+    }
+
+    void remove(int fd) {
+      bool err = epoll_ctl(poller_fd, EPOLL_CTL_DEL, fd, nullptr) == -1;
+      if (err) {
+        close();
+        throw std::runtime_error{"Polly failed to remove a file descriptor to epoll"};
       }
     }
 

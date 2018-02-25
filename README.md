@@ -18,7 +18,7 @@ bench/nodejs
 
 The benchmark scripts use `wrk`.
 
-Currently Photon is pretty close to a Node.js clustered server, and far behind Go. I'm working to implement a Goroutine-like scheduler in Photon.
+Photon is very fast because it uses non-blocking I/O, edge-triggered polling, and 12 threads.
 
 A recent benchmark with `bench/photon` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
 
@@ -26,11 +26,11 @@ A recent benchmark with `bench/photon` on an `Intel(R) Core(TM) i3-2310M CPU @ 2
 Running 10s test @ http://localhost:8080
   12 threads and 1000 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    16.30ms   19.41ms 442.44ms   90.78%
-    Req/Sec     1.52k   465.15     3.58k    71.91%
-  181973 requests in 10.09s, 6.60MB read
-Requests/sec:  18036.24
-Transfer/sec:    669.67KB
+    Latency    10.57ms    9.95ms  99.08ms   71.38%
+    Req/Sec     8.49k     2.94k   39.13k    76.03%
+  1013099 requests in 10.09s, 36.71MB read
+Requests/sec: 100405.04
+Transfer/sec:      3.64MB
 ```
 
 # Heroku

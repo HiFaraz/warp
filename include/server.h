@@ -9,7 +9,7 @@
 #include "polly.h" // import Polly
 #include "socket.h" // import ServerSocket
 
-using client_event_callback_t = std::function<void(int)>;
+using client_event_callback_t = std::function<void(int, std::function<void()>)>;
 
 constexpr int MAX_EVENTS = 100000;
 
@@ -24,19 +24,16 @@ class Server {
 
   public:
     ~Server() {
-      // server_socket.shutdownIncoming();
+      console::log("closing server");
       server_socket.close();
     }
 
     Server(EventLoop &event_loop) {
+      poller.add(server_socket.get_fd());
       event_loop.push_poll([this]() -> void {
-        // accept new connections
-        // instead of accepting only when triggered by epoll, this
-        // tries at least one accept each loop. However it avoids a conditional
-        // check if the poller event is for the server. This is a good trade-off
-        // for a server under heavy load with short-lived connections
-        // I have tested disabling the loop, but it seems to allow ~10% more
-        // requests per second
+        event_count = poller.wait();
+        for (event_index = 0; event_index < event_count; ++event_index) {
+          if (poller.events[event_index].data.fd == server_socket.get_fd()) {
         while(true) {
           try {
             int client_fd = server_socket.accept();
@@ -45,12 +42,12 @@ class Server {
             break;
           }
         }
-
-        // process client events
-        event_count = poller.wait();
-        for (event_index = 0; event_index < event_count; ++event_index) {
-          // TODO check for client hangup or closing of the write stream
-          client_event_cb(poller.events[event_index].data.fd);
+          } else {
+            client_event_cb(poller.events[event_index].data.fd, [this]() -> void {
+              poller.remove(poller.events[event_index].data.fd);
+              close(poller.events[event_index].data.fd);
+            });
+          }
         }
       });
     }
