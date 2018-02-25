@@ -9,18 +9,18 @@
 #include "polly.h" // import Polly
 #include "socket.h" // import ServerSocket
 
-using client_event_callback_t = std::function<void(int, std::function<void()>)>;
+using request_callback_t = std::function<void(char*, ClientSocket&)>;
 
 constexpr int MAX_EVENTS = 100000;
 
 class Server {
 
   private:
-    client_event_callback_t client_event_cb;
-    int                     event_count;
-    int                     event_index;
-    Polly                   poller{MAX_EVENTS};
-    ServerSocket            server_socket;
+    int                 event_count;
+    int                 event_index;
+    Polly               poller{MAX_EVENTS};
+    request_callback_t  request_cb;
+    ServerSocket        server_socket;
 
   public:
     ~Server() {
@@ -34,19 +34,32 @@ class Server {
         event_count = poller.wait();
         for (event_index = 0; event_index < event_count; ++event_index) {
           if (poller.events[event_index].data.fd == server_socket.get_fd()) {
-        while(true) {
-          try {
-            int client_fd = server_socket.accept();
-            poller.add(client_fd);
-          } catch (...) {
-            break;
-          }
-        }
+            while(true) {
+              try {
+                int client_fd = server_socket.accept();
+                poller.add(client_fd);
+              } catch (...) {
+                break;
+              }
+            }
           } else {
-            client_event_cb(poller.events[event_index].data.fd, [this]() -> void {
+            // TODO support request pipelining
+            ClientSocket client_socket{poller.events[event_index].data.fd};
+            char buffer[BUFSIZ] = {0};
+            ssize_t bufferSize = 0;
+            ssize_t chunkSize = 0;
+            do {
+              bufferSize += chunkSize;
+              chunkSize = client_socket.recv(buffer, BUFSIZ);
+              // std::cout << "recv " << chunkSize << " bytes" << std::endl;
+            } while (chunkSize > 0);
+
+            if (bufferSize > 0) {
+              request_cb(buffer, client_socket);
+            } else if (chunkSize == 0) {
               poller.remove(poller.events[event_index].data.fd);
               close(poller.events[event_index].data.fd);
-            });
+            }
           }
         }
       });
@@ -56,8 +69,8 @@ class Server {
       server_socket.listen(port);
     }
 
-    void on_client_event(client_event_callback_t listener) {
-      client_event_cb = listener;
+    void on_request(request_callback_t listener) {
+      request_cb = listener;
     }
 };
 

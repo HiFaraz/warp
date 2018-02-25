@@ -82,8 +82,8 @@ class ClientSocket : public Socket {
       return ::recv(fd, buffer, bufferSize, 0);
     }
 
-    ssize_t send(char* buffer, ssize_t bufferSize) {
-      return ::send(fd, buffer, bufferSize, 0);
+    ssize_t send(char const* message) {
+      return ::send(fd, message, strlen(message), 0);
     }
 };
 
