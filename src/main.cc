@@ -3,13 +3,13 @@
 
 #include "photon.h"
 #include "photon/cluster.h" // import cluster (namespace)
-#include "photon/net.h" // import tcp::Server, ClientSocket
+#include "photon/net.h" // import tcp::Server, tcp::Socket
 
 void start_server() {
   EventLoop event_loop;
   tcp::Server server{event_loop};
 
-  server.on_data([](char* data, ClientSocket &socket){
+  server.on_data([](char* data, ssize_t data_size, tcp::Socket &socket){
     socket.send("HTTP/1.1 200 OK\r\nContent-length: 11\r\n\r\nHello world");
   });
 

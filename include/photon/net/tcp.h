@@ -8,11 +8,11 @@
 #include "./polly.h" // import Polly
 #include "./socket.h" // import ServerSocket
 
-using data_handler_t = std::function<void(char*, ClientSocket&)>;
-
 constexpr int MAX_EVENTS = 100000;
 
 namespace tcp {
+
+using data_handler_t = std::function<void(char*, ssize_t, Socket&)>;
   
   class Server {
 
@@ -23,31 +23,36 @@ namespace tcp {
       Polly           poller{MAX_EVENTS};
       ServerSocket    server_socket;
 
+      // per-client variables, can be shared because messages are handled in series within a thread
+      char            buffer[BUFSIZ];
+      Socket          client_socket;
+
       void accept() {
         while(true) {
           try {
-            int client_fd = server_socket.accept();
-            poller.add(client_fd);
+            poller.add(server_socket.accept());
           } catch (...) {
             break;
           }
         }
       }
 
-      void handle_data(ClientSocket &socket) {
-        // TODO support request pipelining
-        char buffer[BUFSIZ] = {0};
-        ssize_t bufferSize = 0;
-        ssize_t chunkSize = 0;
-        do {
-          bufferSize += chunkSize;
-          chunkSize = socket.recv(buffer, BUFSIZ);
-          // std::cout << "recv " << chunkSize << " bytes" << std::endl;
-        } while (chunkSize > 0);
+      // TODO support request pipelining
+      void handle_data() {
+        // reset variables
+        // we do not reset buffer, instead we pass the buffer content size to the callback
+        ssize_t buffer_size = 0;
+        ssize_t chunk_size = 0;
 
-        if (bufferSize > 0) {
-          data_handler(buffer, socket);
-        } else if (chunkSize == 0) {
+        do {
+          buffer_size += chunk_size;
+          chunk_size = client_socket.recv(buffer, BUFSIZ);
+          // std::cout << "recv " << chunk_size << " bytes" << std::endl;
+        } while (chunk_size > 0);
+
+        if (buffer_size > 0) {
+          data_handler(buffer, buffer_size, client_socket);
+        } else if (chunk_size == 0) {
           poller.remove(poller.events[event_index].data.fd);
           close(poller.events[event_index].data.fd);
         }
@@ -64,13 +69,12 @@ namespace tcp {
 
         event_loop.push_poll([this]() -> void {
           event_count = poller.wait();
-
           for (event_index = 0; event_index < event_count; ++event_index) {
             if (poller.events[event_index].data.fd == server_socket.get_fd()) {
               accept();
             } else {
-              ClientSocket client_socket{poller.events[event_index].data.fd};
-              handle_data(client_socket);
+              client_socket.set_fd(poller.events[event_index].data.fd);
+              handle_data();
             }
           }
         });
