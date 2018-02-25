@@ -27,7 +27,7 @@ if [ $? -eq 0 ];then
   export PORT=8082
   write $UNDERLINE "\bBenchmarking"
   go run bench/src/hello.go &
-  sleep 0.5
+  sleep 1
   echo
   wrk -t12 -c1000 -d10s http://localhost:8082
 
