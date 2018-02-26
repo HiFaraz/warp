@@ -30,7 +30,7 @@ namespace net {
     public:
       struct epoll_event *  events;
       
-      Poller(int max_events, int timeout) {
+      Poller(int max_events, int timeout = BLOCKING_TIMEOUT) {
         poller_fd = epoll_create1(0);
       
         if(poller_fd == -1) {
@@ -45,9 +45,6 @@ namespace net {
         this->timeout = timeout;
         this->max_events = max_events;
       }
-
-      // timeout is set to BLOCKING_TIMEOUT if not provided
-      Poller(int max_events) : Poller(max_events, BLOCKING_TIMEOUT) {};
 
       ~Poller() {
         close();
