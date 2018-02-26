@@ -86,7 +86,7 @@ namespace tcp {
         set_fd(socket_fd);
       }
 
-      ssize_t recv(Buffer &buffer) {
+      ssize_t recv(Buffer& buffer) {
         return ::recv(fd, buffer.data, buffer.capacity, 0);
       }
 
@@ -127,10 +127,10 @@ namespace tcp {
       }
 
       int accept() {
-        struct sockaddr_storage clientAddress; // sockaddr_storage supports both IPv4 and IPv6
-        socklen_t clientAddressLength = sizeof(clientAddress);
+        struct sockaddr_storage client_address; // sockaddr_storage supports both IPv4 and IPv6
+        socklen_t client_address_len = sizeof(client_address);
         
-        int connectionId = ::accept(fd, (struct sockaddr *)&clientAddress, (socklen_t*)&clientAddressLength);
+        int connectionId = ::accept(fd, (struct sockaddr *)&client_address, (socklen_t*)&client_address_len);
 
         if (connectionId == -1) {
           throw std::runtime_error{"accept failed"};

@@ -8,7 +8,7 @@
 void start_server() {
   tcp::Server server;
 
-  server.on_data([](Buffer &buffer, tcp::Socket &socket){
+  server.on_data([](Buffer& buffer, tcp::Socket& socket){
     // console::log(buffer);
     socket.send("HTTP/1.1 200 OK\r\nContent-length: 11\r\n\r\nHello world");
   });

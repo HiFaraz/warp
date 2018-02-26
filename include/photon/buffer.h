@@ -31,8 +31,7 @@ class Buffer {
     }
 };
 
-std::ostream& operator<<(std::ostream &os, const Buffer &buffer)  
-{  
+std::ostream& operator<<(std::ostream& os, const Buffer& buffer) {  
     os << buffer.data;
     return os;  
 }  

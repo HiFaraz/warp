@@ -15,7 +15,7 @@ namespace event {
       std::vector<poll_callback_t> polls;
 
     void run_polls() {
-      for(poll_callback_t & cb : polls) {
+      for(poll_callback_t& cb : polls) {
         cb();
       }
     }
@@ -28,7 +28,7 @@ namespace event {
 
     public:
       template <class T>
-      void add(T &event_provider) {
+      void add(T& event_provider) {
         this->push_poll(event_provider.poll_and_process);
       }
 
