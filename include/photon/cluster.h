@@ -6,6 +6,8 @@
 #include <unistd.h> // fork
 #include <vector> // std::vector
 
+#include "photon/console.h" // console
+
 /**
  * Cluster supports both simple forks and threads
  * 
