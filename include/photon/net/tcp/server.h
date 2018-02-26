@@ -1,18 +1,19 @@
 #ifndef PHOTON_NET_TCP_SERVER_H
 #define PHOTON_NET_TCP_SERVER_H
 
-#include <iostream> // import std::cout, std::endl
-#include <functional> // import std::function
+#include <iostream> // std::cout, std::endl
+#include <functional> // std::function
 
-#include "photon/event/loop.h" // import event::poll_callback_t
-#include "photon/net/poller.h" // import net::Poller
-#include "photon/net/tcp/socket.h" // import ServerSocket, Socket
+#include "photon/buffer.h" // Buffer
+#include "photon/event/loop.h" // event::poll_callback_t
+#include "photon/net/poller.h" // net::Poller
+#include "photon/net/tcp/socket.h" // ServerSocket, Socket
 
 constexpr int MAX_EVENTS = 100000;
 
 namespace tcp {
 
-using data_handler_t = std::function<void(char*, ssize_t, Socket&)>;
+using data_handler_t = std::function<void(Buffer&, Socket&)>;
   
   class Server {
 
@@ -24,7 +25,8 @@ using data_handler_t = std::function<void(char*, ssize_t, Socket&)>;
       ServerSocket    server_socket;
 
       // per-client variables, can be shared because messages are handled in series within a thread
-      char            buffer[BUFSIZ];
+      Buffer          buffer{BUFSIZ};
+      // char            buffer[BUFSIZ];
       Socket          client_socket;
 
       void accept() {
@@ -41,18 +43,18 @@ using data_handler_t = std::function<void(char*, ssize_t, Socket&)>;
       void handle_data() {
         // reset variables
         // we do not reset buffer, instead we pass the buffer content size to the callback
-        ssize_t buffer_size = 0;
-        ssize_t chunk_size = 0;
+        buffer.size = 0;
+        ssize_t recv_size = 0;
 
         do {
-          buffer_size += chunk_size;
-          chunk_size = client_socket.recv(buffer, BUFSIZ);
-          // std::cout << "recv " << chunk_size << " bytes" << std::endl;
-        } while (chunk_size > 0);
+          buffer.size += recv_size;
+          recv_size = client_socket.recv(buffer);
+          // std::cout << "recv " << recv_size << " bytes" << std::endl;
+        } while (recv_size > 0);
 
-        if (buffer_size > 0) {
-          data_handler(buffer, buffer_size, client_socket);
-        } else if (chunk_size == 0) {
+        if (buffer.size > 0) {
+          data_handler(buffer, client_socket);
+        } else if (recv_size == 0) {
           poller.remove(poller.events[event_index].data.fd);
           close(poller.events[event_index].data.fd);
         }

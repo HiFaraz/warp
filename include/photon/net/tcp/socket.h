@@ -1,19 +1,19 @@
 #ifndef PHOTON_NET_TCP_SOCKET_H
 #define PHOTON_NET_TCP_SOCKET_H
 
-#include <cstring> // import memset
+#include <cstring> // memset
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h> // import close
+#include <unistd.h> // close
 
-#include <fcntl.h> // import fcntl, F_GETFL, F_SETFL, O_NONBLOCK (non-blocking sockets)
+#include <fcntl.h> // fcntl, F_GETFL, F_SETFL, O_NONBLOCK (non-blocking sockets)
 
 #include <stdexcept>
 // #include <cerrno> // for errno
-// #include <errno.h>
 
-#include "photon/console.h"
+#include "photon/buffer.h" // Buffer
+#include "photon/console.h" // console
 
 namespace tcp {
 
@@ -86,8 +86,8 @@ namespace tcp {
         set_fd(socket_fd);
       }
 
-      ssize_t recv(char* buffer, ssize_t buffer_size) {
-        return ::recv(fd, buffer, buffer_size, 0);
+      ssize_t recv(Buffer &buffer) {
+        return ::recv(fd, buffer.data, buffer.capacity, 0);
       }
 
       ssize_t send(char const* message) {

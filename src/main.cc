@@ -1,14 +1,15 @@
 #include <iostream>
 #include <string>
 
-#include "photon/core.h"
-#include "photon/cluster.h" // import cluster
-#include "photon/net.h" // import tcp::Server, tcp::Socket
+#include "photon/core.h" // Buffer, console, env, event
+#include "photon/cluster.h" // cluster
+#include "photon/net.h" // tcp
 
 void start_server() {
   tcp::Server server;
 
-  server.on_data([](char* data, ssize_t data_size, tcp::Socket &socket){
+  server.on_data([](Buffer &buffer, tcp::Socket &socket){
+    // console::log(buffer);
     socket.send("HTTP/1.1 200 OK\r\nContent-length: 11\r\n\r\nHello world");
   });
 
