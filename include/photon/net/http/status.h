@@ -10,8 +10,6 @@ namespace http {
     std::string description;
   };
 
-  struct Status OK = { 200, "OK" };
-
   // 1xx - Informational
   struct Status CONTINUE = { 100, "Continue" };
   struct Status SWITCHING_PROTOCOLS = { 101, "Switching Protocols" };
