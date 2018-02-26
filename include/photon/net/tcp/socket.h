@@ -90,8 +90,12 @@ namespace tcp {
         return ::recv(fd, buffer.data, buffer.capacity, 0);
       }
 
-      ssize_t send(char const* message) {
+      ssize_t send(const char* message) {
         return ::send(fd, message, strlen(message), 0);
+      }
+
+      ssize_t send(Buffer& buffer) {
+        return ::send(fd, buffer.data, buffer.size, 0);
       }
 
       void set_fd(int socket_fd) {
