@@ -13,7 +13,7 @@ constexpr int MAX_EVENTS = 100000;
 
 namespace tcp {
 
-using data_handler_t = std::function<void(Buffer&, Socket&)>;
+  using data_handler_t = std::function<void(Buffer&, Socket&)>;
   
   class Server {
 
