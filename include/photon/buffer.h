@@ -1,10 +1,11 @@
 #ifndef PHOTON_BUFFER_H
 #define PHOTON_BUFFER_H
 
-#include <cstddef> // size_t
+#include <cstddef> // std::size_t
 #include <cstring> // memcpy, memset
 #include <iostream> // std::ostream
 #include <stdexcept>
+#include <string> // std::string
 
 class Buffer {
   
@@ -33,6 +34,10 @@ class Buffer {
       size += input_size;
     }
 
+    void append(std::string input) {
+      append(input.c_str());
+    }
+
     void empty() {
       size = 0;
     }
@@ -45,15 +50,16 @@ class Buffer {
       return data[index];
     }
 
-    Buffer& operator<<(const char* input) {
+    template <typename T>
+    Buffer& operator<<(T input) {
       append(input);
       return *this;
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const Buffer& buffer) {  
-  os << buffer.data;
-  return os;  
+std::ostream& operator<<(std::ostream& stream, const Buffer& buffer) {  
+  stream << buffer.data;
+  return stream;  
 }
 
 #endif // !PHOTON_BUFFER_H
