@@ -2,15 +2,15 @@
 #define PHOTON_NET_TCP_SOCKET_H
 
 #include <cstring> // memset
+#include <string> // std::string
+#include <stdexcept>
+
+// Linux system headers
+#include <fcntl.h> // fcntl, F_GETFL, F_SETFL, O_NONBLOCK (non-blocking sockets)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h> // close
-
-#include <fcntl.h> // fcntl, F_GETFL, F_SETFL, O_NONBLOCK (non-blocking sockets)
-
-#include <stdexcept>
-// #include <cerrno> // for errno
 
 #include "photon/buffer.h" // Buffer
 #include "photon/console.h" // console
@@ -96,6 +96,10 @@ namespace tcp {
 
       ssize_t send(Buffer& buffer) {
         return ::send(fd, buffer.data, buffer.size, 0);
+      }
+
+      ssize_t send(std::string message) {
+        return send(message.c_str());
       }
 
       void set_fd(int socket_fd) {
