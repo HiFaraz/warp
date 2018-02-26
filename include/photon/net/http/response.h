@@ -2,8 +2,12 @@
 #define PHOTON_NET_HTTP_RESPONSE_H
 
 #include <stdexcept>
+#include <string> // std::to_string
 
 #include "photon/buffer.h" // Buffer
+// #include "photon/net/http/headers.h" // Headers
+#include "photon/net/http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
+#include "photon/net/http/status.h" // Status
 #include "photon/net/tcp/socket.h" // tcp::Socket
 
 namespace http {
@@ -11,25 +15,28 @@ namespace http {
   class Response {
 
     public:
-      void end(const char* input = nullptr) {
-        write(input);
+      struct Status status = OK;
+
+      void end() {
         writable = false;
       }
 
-      bool is_writable() {
+      template <typename T>
+      void end(T input) {
+        write(input);
+        end();
+      }
+
+      bool is_writable() const {
         return writable;
       }
 
-      void reset() {
-        buffer.empty();
-        writable = true;
+      void set(std::string header_name, std::string value) {
+        headers << header_name + ": " + value + new_ln();
       }
 
-      void write(const char* input = nullptr) {
-        if (input == nullptr) {
-          return;
-        }
-
+      template <typename T>
+      void write(T input) {
         if (writable) {
           buffer << input;
           // TODO handle errors where input would overflow the buffer
@@ -38,7 +45,8 @@ namespace http {
         }
       }
 
-      Response& operator<<(const char* input) {
+      template <typename T>
+      Response& operator<<(T input) {
         write(input);
         return *this;
       }
@@ -47,8 +55,20 @@ namespace http {
       friend class Server;
 
       Buffer      buffer{BUFSIZ};
+      Buffer      headers{HTTP_MAX_HEADER_SIZE()};
       tcp::Socket socket;
       bool        writable = true;
+
+      std::string get_status_line(std::string http_version = "HTTP/1.1") const {
+        return http_version + " " + std::to_string(status.code) + " " + status.description;
+      }
+
+      void reset() {
+        buffer.empty();
+        headers.empty();
+        status = OK;
+        writable = true;
+      }
   };
 
 }

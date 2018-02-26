@@ -6,6 +6,8 @@
 #include "photon/net/http/response.h" // http::Response
 #include "photon/net/tcp/server.h" // tcp::Server
 
+#include "photon/net/http/message.h" // temp, move into request and response
+
 namespace http {
 
   using request_handler_t = std::function<void(Buffer&, Response&)>;
@@ -30,7 +32,15 @@ namespace http {
       tcp::data_handler_t handle_data = [this](Buffer& buffer, tcp::Socket& socket) -> void {
         response.socket = socket;
         request_handler(buffer, response);
-        socket.send(response.buffer);
+        
+        // TODO should be response.flush instead of socket.send
+        socket.send(
+          std::string{response.get_status_line()} + new_ln()
+          + "Content-Length: " + std::to_string(response.buffer.size) + new_ln()
+          + response.headers.data
+          + new_ln()
+          + response.buffer.data
+        );
         // TODO check that full buffer was sent
         response.reset();
       };

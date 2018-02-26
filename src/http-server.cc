@@ -8,13 +8,21 @@
 void start_server() {
   http::Server server;
 
-    server.on_request([](Buffer& buffer, http::Response& res) -> void {
-      // console::log(buffer);
-      res << "HTTP/1.1 200 OK\r\n"
-          << "Content-length: 11\r\n"
-          << "\r\n"
-          << "Hello world";
-    });
+  server.on_request([](Buffer& buffer, http::Response& res) -> void {
+
+    /**
+     * res - http::Response instance
+     * 
+     * - end() | end(T input)
+     * - is_writable()
+     * - set([std::string|const char*] header_name, [std::string|const char*] value)
+     * - http::Status status
+     * - write(T input)
+     * - operator<< (T input) : write(T input)
+     */
+
+    res << "Hello world!\nMy name is Photon.";
+  });
 
   int port = env::get_int("PORT", 8080);
   server.listen(port);
