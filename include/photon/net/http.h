@@ -4,5 +4,6 @@
 #include "photon/net/http/request.h"
 #include "photon/net/http/response.h"
 #include "photon/net/http/server.h"
+#include "photon/net/http/status.h"
 
 #endif // !PHOTON_NET_HTTP_H
