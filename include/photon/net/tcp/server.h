@@ -24,9 +24,9 @@ using data_handler_t = std::function<void(Buffer&, Socket&)>;
       net::Poller     poller{MAX_EVENTS};
       ServerSocket    server_socket;
 
-      // per-client variables, can be shared because messages are handled in series within a thread
+      // per-client variables, can be shared because messages
+      // are handled in series within a thread
       Buffer          buffer{BUFSIZ};
-      // char            buffer[BUFSIZ];
       Socket          client_socket;
 
       void accept() {
@@ -60,6 +60,19 @@ using data_handler_t = std::function<void(Buffer&, Socket&)>;
         }
       }
 
+      friend class event::Loop;
+      event::poll_callback_t poll_and_process = [this]() -> void {
+        event_count = poller.wait();
+        for (event_index = 0; event_index < event_count; ++event_index) {
+          if (poller.events[event_index].data.fd == server_socket.get_fd()) {
+            accept();
+          } else {
+            client_socket.set_fd(poller.events[event_index].data.fd);
+            handle_data();
+          }
+        }
+      };
+
     public:
       ~Server() {
         server_socket.close();
@@ -76,18 +89,6 @@ using data_handler_t = std::function<void(Buffer&, Socket&)>;
       void on_data(data_handler_t handler) {
         data_handler = handler;
       }
-
-      event::poll_callback_t poll_and_process = [this]() -> void {
-        event_count = poller.wait();
-        for (event_index = 0; event_index < event_count; ++event_index) {
-          if (poller.events[event_index].data.fd == server_socket.get_fd()) {
-            accept();
-          } else {
-            client_socket.set_fd(poller.events[event_index].data.fd);
-            handle_data();
-          }
-        }
-      };
   };
 
 }
