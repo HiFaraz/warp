@@ -8,13 +8,13 @@
 void start_server() {
   http::Server server;
 
-  // server.on_request([](http::Request& req, http::Response& res){
-  //   console::log(req.buffer);
-  //   res << "HTTP/1.1 200 OK\r\n"
-  //       << "Content-length: 11\r\n"
-  //       << "\r\n"
-  //       << "Hello world";
-  // });
+    server.on_request([](Buffer& buffer, http::Response& res) -> void {
+      // console::log(buffer);
+      res << "HTTP/1.1 200 OK\r\n"
+          << "Content-length: 11\r\n"
+          << "\r\n"
+          << "Hello world";
+    });
 
   int port = env::get_int("PORT", 8080);
   server.listen(port);
