@@ -1,8 +1,8 @@
 #ifndef PHOTON_EVENT_LOOP_H
 #define PHOTON_EVENT_LOOP_H
 
-#include <functional> // import std::function
-#include <vector> // import std::vector
+#include <functional> // std::function
+#include <vector> // std::vector
 
 namespace event {
 

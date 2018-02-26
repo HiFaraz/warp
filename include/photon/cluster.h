@@ -1,10 +1,10 @@
 #ifndef PHOTON_CLUSTER_H
 #define PHOTON_CLUSTER_H
 
-#include <functional> // import std::function
-#include <thread> // import std::thread
-#include <unistd.h> // import fork
-#include <vector> // import std::vector
+#include <functional> // std::function
+#include <thread> // std::thread
+#include <unistd.h> // fork
+#include <vector> // std::vector
 
 /**
  * Cluster supports both simple forks and threads

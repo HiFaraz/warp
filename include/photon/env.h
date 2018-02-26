@@ -1,8 +1,8 @@
 #ifndef PHOTON_ENV_H
 #define PHOTON_ENV_H
 
-#include <cstdlib> // import std::getenv
-#include <string> // import std::stoi
+#include <cstdlib> // std::getenv
+#include <string> // std::stoi
 
 namespace env {
 

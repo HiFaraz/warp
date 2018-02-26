@@ -1,11 +1,11 @@
 #ifndef PHOTON_NET_POLLER_H
 #define PHOTON_NET_POLLER_H
 
-#include <functional> // import std::function
-#include <new> // import std::nothrow
+#include <functional> // std::function
+#include <new> // std::nothrow
 #include <stdexcept>
-#include <sys/epoll.h> // import epoll_create1, epoll_ctl, epoll_event
-#include <unistd.h> // import close
+#include <sys/epoll.h> // epoll_create1, epoll_ctl, epoll_event
+#include <unistd.h> // close
 
 /**
  * Poller is a class for using epoll with the Socket class
