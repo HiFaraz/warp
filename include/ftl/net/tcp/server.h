@@ -9,7 +9,7 @@
 #include "ftl/net/poller.h" // net::Poller
 #include "ftl/net/tcp/socket.h" // ServerSocket, Socket
 
-constexpr int MAX_EVENTS = 100000;
+constexpr auto MAX_EVENTS = 100000;
 
 namespace tcp {
 
@@ -19,29 +19,13 @@ namespace tcp {
   class Server {
 
     public:
-      ~Server() {
-        server_socket.close();
-      }
+      Server();
+      ~Server();
 
-      Server() {
-        poller.add(server_socket.get_fd());
-      }
-
-      void get_client_socket(std::function<void(Socket&)> cb) {
-        cb(client_socket);
-      }
-
-      void listen(int port) {
-        server_socket.listen(port);
-      }
-
-      void on_data(data_handler_t handler) {
-        data_handler = handler;
-      }
-
-      void on_data(data_handler_lite_t handler) {
-        data_handler_lite = handler;
-      }
+      void get_client_socket(std::function<void(Socket&)> cb);
+      void listen(int port);
+      void on_data(data_handler_t handler);
+      void on_data(data_handler_lite_t handler);
 
     private:
       data_handler_t      data_handler;
@@ -53,43 +37,11 @@ namespace tcp {
 
       // per-client variables, can be shared because messages
       // are handled in series within a thread
-      Buffer          buffer{BUFSIZ};
-      Socket          client_socket;
+      Buffer buffer{BUFSIZ};
+      Socket client_socket;
 
-      void accept() {
-        while(true) {
-          try {
-            poller.add(server_socket.accept());
-          } catch (...) {
-            break;
-          }
-        }
-      }
-
-      // TODO support request pipelining
-      void handle_data() {
-        // reset variables
-        // we do not reset buffer, instead we pass the buffer content size to the callback
-        buffer.size = 0;
-        ssize_t recv_size = 0;
-
-        do {
-          buffer.size += recv_size;
-          recv_size = client_socket.recv(buffer);
-          // std::cout << "recv " << recv_size << " bytes" << std::endl;
-        } while (recv_size > 0);
-
-        if (buffer.size > 0) {
-          if (data_handler_lite != nullptr) {
-            data_handler_lite(buffer);
-          } else {
-            data_handler(buffer, client_socket);
-          }
-        } else if (recv_size == 0) {
-          poller.remove(poller.events[event_index].data.fd);
-          close(poller.events[event_index].data.fd);
-        }
-      }
+      void accept();
+      void handle_data(); // TODO support request pipelining
 
       friend class event::Loop;
       event::poll_callback_t poll_and_process = [this]() -> void {
@@ -105,8 +57,64 @@ namespace tcp {
       };
   };
 
+  Server::Server() {
+    poller.add(server_socket.get_fd());
+  }
+
+  Server::~Server() {
+    server_socket.close();
+  }
+
+  void Server::accept() {
+    while(true) {
+      try {
+        poller.add(server_socket.accept());
+      } catch (...) {
+        break;
+      }
+    }
+  }
+
+  void Server::get_client_socket(std::function<void(Socket&)> cb) {
+    cb(client_socket);
+  }
+
+  void Server::handle_data() {
+    // reset variables
+    // we do not reset buffer, instead we pass the buffer content size to the callback
+    buffer.size = 0;
+    auto recv_size = 0;
+
+    do {
+      buffer.size += recv_size;
+      recv_size = client_socket.recv(buffer);
+      // std::cout << "recv " << recv_size << " bytes" << std::endl;
+    } while (recv_size > 0);
+
+    if (buffer.size > 0) {
+      if (data_handler_lite != nullptr) {
+        data_handler_lite(buffer);
+      } else {
+        data_handler(buffer, client_socket);
+      }
+    } else if (recv_size == 0) {
+      poller.remove(poller.events[event_index].data.fd);
+      close(poller.events[event_index].data.fd);
+    }
+  }
+
+  void Server::listen(int port) {
+    server_socket.listen(port);
+  }
+
+  void Server::on_data(data_handler_t handler) {
+    data_handler = handler;
+  }
+
+  void Server::on_data(data_handler_lite_t handler) {
+    data_handler_lite = handler;
+  }
+
 }
 
 #endif // !FTL_NET_TCP_SERVER_H
-
-      
