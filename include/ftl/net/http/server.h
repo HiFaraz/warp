@@ -33,7 +33,7 @@ namespace http {
 
       tcp::data_handler_lite_t handle_data = [this](Buffer& buffer) -> void {
         request_handler(buffer, response);
-        response.end(); // may have already been called, but safe to call again
+        response.flush_buffer();
         response.reset();
       };
       Request           request;

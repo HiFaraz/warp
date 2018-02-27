@@ -17,7 +17,7 @@ namespace http {
       struct Status status = OK;
 
       void end() {
-        flush_buffer();
+        writable = false;
       }
 
       template <typename T>
@@ -28,10 +28,10 @@ namespace http {
 
       void flush_buffer() {
         // safe to call this function multiple times, because
-        // if exits if we have already had a successful write
+        // if exits if we have already had a successful send
 
-        if (!writable) {
-          console::log("exit flush early, not writable");
+        if (sent) {
+          // console::log("exit flush early, already sent");
           return;
         }
 
@@ -48,9 +48,13 @@ namespace http {
         
         // TODO check that full buffer was sent
 
-        if (err) {
-          writable = false;
+        if (!err) {
+          sent = true;
         }
+        }
+
+      bool is_sent() const {
+        return sent;
       }
 
       bool is_writable() const {
@@ -80,10 +84,11 @@ namespace http {
     private:
       friend class Server;
 
-      Buffer      buffer{BUFSIZ};
-      Buffer      headers{HTTP_MAX_HEADER_SIZE()};
-      tcp::Socket* socket;
-      bool        writable = true;
+      Buffer        buffer{BUFSIZ};
+      Buffer        headers{HTTP_MAX_HEADER_SIZE()};
+      bool          sent = false;
+      tcp::Socket*  socket;
+      bool          writable = true;
 
       std::string get_status_line(std::string http_version = "HTTP/1.1") const {
         return http_version + " " + std::to_string(status.code) + " " + status.description;
@@ -92,6 +97,7 @@ namespace http {
       void reset() {
         buffer.empty();
         headers.empty();
+        sent = false;
         status = OK;
         writable = true;
       }
