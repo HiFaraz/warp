@@ -74,10 +74,6 @@ namespace tcp {
     }
   }
 
-  void Server::get_buffer(std::function<void(Buffer&)> cb) {
-    cb(buffer);
-  }
-
   void Server::handle_data() {
     // reset variables
     // we do not reset buffer, instead we pass the buffer content size to the callback
