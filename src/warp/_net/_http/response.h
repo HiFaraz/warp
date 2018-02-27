@@ -4,10 +4,10 @@
 #include <stdexcept>
 #include <string> // std::to_string
 
-#include <warp/buffer> // Buffer
-#include <warp/_net/_http/message> // HTTP_MAX_HEADER_SIZE, new_ln
-#include <warp/_net/_http/status> // Status
-#include <warp/_net/_tcp/socket> // tcp::Socket
+#include "warp/buffer.h" // Buffer
+#include "warp/_net/_http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
+#include "warp/_net/_http/status.h" // Status
+#include "warp/_net/_tcp/socket.h" // tcp::Socket
 
 namespace http {
 
@@ -20,7 +20,7 @@ namespace http {
 
       template <typename T>
       void end(T input);
-      void flush_buffer();
+      void flush_buffer_to(tcp::Socket&);
       auto is_sent() const;
       auto is_writable() const;
       void set(std::string header_name, std::string value);
@@ -37,7 +37,7 @@ namespace http {
       Buffer        buffer{BUFSIZ};
       Buffer        headers{HTTP_MAX_HEADER_SIZE()};
       bool          sent = false;
-      tcp::Socket*  socket;
+      // tcp::Socket&  socket;
       bool          writable = true;
 
       auto get_status_line(std::string http_version = "HTTP/1.1") const;
@@ -58,7 +58,7 @@ namespace http {
     return http_version + " " + std::to_string(status.code) + " " + status.description;
   }
 
-  void Response::flush_buffer() {
+  void Response::flush_buffer_to(tcp::Socket& socket) {
     // safe to call this function multiple times, because
     // if exits if we have already had a successful send
 
@@ -70,7 +70,7 @@ namespace http {
     // send whatever we have to the socket
     // assume no chunked transfers for now, only one short
     // therefore we can send the headers unconditionally
-    auto err = socket->send(
+    auto err = socket.send(
       std::string{get_status_line()} + new_ln()
       + "Content-Length: " + std::to_string(buffer.size) + new_ln()
       + headers.data
