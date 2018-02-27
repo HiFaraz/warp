@@ -19,46 +19,46 @@ namespace cluster {
 
   void fork(int num_forks) {
     // use the parent process, so actually create num_forks - 1
-    int fork_count = 1; // account for the parent process
+    auto fork_count = 1; // account for the parent process
     while(fork_count < num_forks) {
-      pid_t pid = ::fork();
-      if (pid > 0) {
-        fork_count++;
-      } else if (pid == 0) {
+      auto pid = ::fork();
+      auto is_child = pid == 0;
+      auto err = pid == -1;
+      if (is_child) {
         break;
+      } else if (!err) {
+        fork_count++;
       }
     }
   }
 
   namespace threads {
-    std::vector<std::thread> list{std::thread::hardware_concurrency()};
+    // create n-1 threads (use the master thread too)
+    auto list = std::vector<std::thread>{};
 
-    std::thread::id get_id() {
+    auto get_id() {
       return std::this_thread::get_id();
     }
 
-    void launch(std::function<void()> task) {
-      console::log("Launching " + std::to_string(list.size()) + " threads");
-
-      // create n-1 threads (use the master thread too)
-      for(unsigned index = 1; index < list.size(); ++index) {
-          list[index] = std::thread(task);
-      }
-
-      task(); // from the master thread
-    }
-
-    void launch(std::function<void()> task, std::size_t num_threads) {
+    void launch(std::function<void()> task, int num_threads) {
       console::log("Launching " + std::to_string(num_threads) + " threads");
-      list = std::vector<std::thread>{num_threads};
+      list.resize(num_threads - 1);
 
-      // create n-1 threads (use the master thread too)
-      for(unsigned index = 1; index < list.size(); ++index) {
-          list[index] = std::thread(task);
+      for(auto& entry : list) {
+        entry = std::thread(task);
       }
 
       task(); // from the master thread
     }
+
+    void launch_per_core(std::function<void()> task, std::size_t num_threads_multiplier) {
+      launch(task, num_threads_multiplier * std::thread::hardware_concurrency());
+    }
+
+    void launch(std::function<void()> task) {
+      launch_per_core(task, 1);
+    }
+
   }
 
 }

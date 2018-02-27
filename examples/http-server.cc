@@ -36,6 +36,6 @@ void start_server() {
 }
 
 int main(int argc, char const *argv[]) {
-  cluster::threads::launch(start_server, 12);
+  cluster::threads::launch_per_core(start_server, 3);
   return EXIT_SUCCESS;
 }
