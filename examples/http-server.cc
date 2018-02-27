@@ -11,14 +11,34 @@ void start_server() {
   server.on_request([](auto& buffer, auto& res) -> void {
 
     /**
-     * http::Response res
+     * http:Request req <warp/net>
+     * ================
      * 
-     * - end() | end(T input)
-     * - is_writable()
-     * - set([std::string|const char*] header_name, [std::string|const char*] value)
-     * - http::Status status
-     * - write(T input)
-     * - operator<< (T input) : write(T input)
+     *  Properties:
+     *  
+     *   - Buffer         body
+     *   - Buffer         buffer
+     *   - unordered_map  headers
+     *   - ???            ip
+     *   - string         method
+     *   - unordered_map  query
+     *   - string         url
+     *  
+     *  Methods:
+     *   - parse_headers()
+     *   - parse_ip()
+     *   - parse_query()
+     * 
+     * http::Response res <warp/net>
+     * ==================
+     * 
+     *  Methods:
+     *   - end() | end(T input)
+     *   - is_writable()
+     *   - set([std::string|const char*] header_name, [std::string|const char*] value)
+     *   - http::Status status
+     *   - write(T input)
+     *   - operator<< (T input) : write(T input)
      */
 
     res << "Hello HTTP!";

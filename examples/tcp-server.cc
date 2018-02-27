@@ -11,13 +11,25 @@ void start_server() {
   server.on_data([](auto& buffer, auto& socket){
 
     /**
-     * Buffer buffer <warp/core.>
+     * Buffer buffer <warp/core>
+     * =============
      * 
-     * - Buffer{int capacity}
-     * - empty()
-     * - fill(int filler)
-     * - operator<< (T input)
-     * - ostream << (Buffer buffer)
+     *  Methods:
+     * 
+     *   - Buffer{int capacity}
+     *   - empty()
+     *   - fill(int filler)
+     *   - operator<< (Tw input)
+     *   - ostream<< (Buffer& buffer)
+     * 
+     * tcp::Socket socket <warp/net>
+     * ==================
+     * 
+     *  Methods:
+     *    
+     *   - close()
+     *   - recv(Buffer&)
+     *   - send(Buffer& | string | const char*)
      */
 
     // console::log(buffer);
