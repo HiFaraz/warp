@@ -1,1 +1,1 @@
-web: ./bin/ftl http
+web: ./bin/ftl-http
