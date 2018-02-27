@@ -5,9 +5,13 @@
 
 namespace http {
 
-  const char* new_ln() { return "\r\n"; }
+  auto new_ln() {
+    return "\r\n";
+  }
 
-  const std::size_t HTTP_MAX_HEADER_SIZE() { return 8 * 1024; } // 8 KiB
+  const auto HTTP_MAX_HEADER_SIZE() {
+    return std::size_t{8 * 1024};// 8 KiB
+  }
 
 }
 
