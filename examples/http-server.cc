@@ -6,9 +6,9 @@
 #include "ftl/net.h" // http
 
 void start_server() {
-  http::Server server;
+  auto server = http::Server{};
 
-  server.on_request([](Buffer& buffer, http::Response& res) -> void {
+  server.on_request([](auto& buffer, auto& res) -> void {
 
     /**
      * res - http::Response instance
@@ -24,13 +24,13 @@ void start_server() {
     res << "Hello HTTP!";
   });
 
-  int port = env::get_int("PORT", 8080);
+  auto port = env::get_int("PORT", 8080);
   server.listen(port);
 
   console::log("Listening on port " + std::to_string(port));
   
   // nothing happens unless we start the event loop
-  event::Loop event_loop;
+  auto event_loop = event::Loop{};
   event_loop.add(server);
   event_loop.start();
 }
