@@ -4,10 +4,10 @@
 #include <iostream> // std::cout, std::endl
 #include <functional> // std::function
 
-#include "warp/buffer.h" // Buffer
-#include "warp/event/loop.h" // event::poll_callback_t
-#include "warp/net/poller.h" // net::Poller
-#include "warp/net/tcp/socket.h" // ServerSocket, Socket
+#include <warp/buffer> // Buffer
+#include <warp/_event/loop> // event::poll_callback_t
+#include <warp/_net/poller> // net::Poller
+#include <warp/_net/_tcp/socket> // ServerSocket, Socket
 
 constexpr auto MAX_EVENTS = 100000;
 

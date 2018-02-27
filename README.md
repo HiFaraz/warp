@@ -1,7 +1,7 @@
 # Warp
 
 - C++ web server framework
-- Fast (90k-105k rps for Hello World)
+- Fast (95k-105k rps for Hello World)
 - Linux only
 
 How:
@@ -14,7 +14,7 @@ How:
 
 The "Hello world" example barely uses any memory and supports at least 1,000 connections.
 
-# Micro-benchmarks
+## Micro-benchmarks
 
 The following micro-benchmarks can be run:
 

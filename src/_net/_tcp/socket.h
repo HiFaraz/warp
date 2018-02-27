@@ -12,8 +12,8 @@
 #include <netinet/in.h>
 #include <unistd.h> // close
 
-#include "warp/buffer.h" // Buffer
-#include "warp/console.h" // console
+#include <warp/buffer> // Buffer
+#include <warp/console> // console
 
 namespace tcp {
 

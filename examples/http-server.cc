@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 
-#include "warp/core.h" // Buffer, console, env, event
-#include "warp/cluster.h" // cluster
-#include "warp/net.h" // http
+#include <warp/core> // Buffer, console, env, event
+#include <warp/cluster> // cluster
+#include <warp/net> // http
 
 void start_server() {
   auto server = http::Server{};
@@ -11,7 +11,7 @@ void start_server() {
   server.on_request([](auto& buffer, auto& res) -> void {
 
     /**
-     * res - http::Response instance
+     * http::Response res
      * 
      * - end() | end(T input)
      * - is_writable()

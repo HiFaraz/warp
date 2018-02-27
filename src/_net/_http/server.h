@@ -1,12 +1,12 @@
 #ifndef WARP_NET_HTTP_SERVER_H
 #define WARP_NET_HTTP_SERVER_H
 
-#include "warp/event/loop.h" // event:Loop
-#include "warp/net/http/request.h" // http::Request
-#include "warp/net/http/response.h" // http::Response
-#include "warp/net/tcp/server.h" // tcp::Server
+#include <warp/_event/loop> // event:Loop
+#include <warp/_net/_http/request> // http::Request
+#include <warp/_net/_http/response> // http::Response
+#include <warp/_net/_tcp/server> // tcp::Server
 
-#include "warp/net/http/message.h" // temp, move into request and response
+#include <warp/_net/_http/message> // temp, move into request and response
 
 namespace http {
 

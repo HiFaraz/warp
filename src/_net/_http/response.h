@@ -4,10 +4,10 @@
 #include <stdexcept>
 #include <string> // std::to_string
 
-#include "warp/buffer.h" // Buffer
-#include "warp/net/http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
-#include "warp/net/http/status.h" // Status
-#include "warp/net/tcp/socket.h" // tcp::Socket
+#include <warp/buffer> // Buffer
+#include <warp/_net/_http/message> // HTTP_MAX_HEADER_SIZE, new_ln
+#include <warp/_net/_http/status> // Status
+#include <warp/_net/_tcp/socket> // tcp::Socket
 
 namespace http {
 

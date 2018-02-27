@@ -1,7 +1,7 @@
 #ifndef WARP_NET_HTTP_REQUEST_H
 #define WARP_NET_HTTP_REQUEST_H
 
-#include "warp/buffer.h" // Buffer
+#include <warp/buffer> // Buffer
 
 namespace http {
 

@@ -1,14 +1,25 @@
 #include <iostream>
 #include <string>
 
-#include "warp/core.h" // Buffer, console, env, event
-#include "warp/cluster.h" // cluster
-#include "warp/net.h" // tcp
+#include <warp/core> // Buffer, console, env, event
+#include <warp/cluster> // cluster
+#include <warp/net> // tcp
 
 void start_server() {
   auto server = tcp::Server{};
 
   server.on_data([](auto& buffer, auto& socket){
+
+    /**
+     * Buffer buffer <warp/core.>
+     * 
+     * - Buffer{int capacity}
+     * - empty()
+     * - fill(int filler)
+     * - operator<< (T input)
+     * - ostream << (Buffer buffer)
+     */
+
     // console::log(buffer);
     socket.send("HTTP/1.1 200 OK\r\nContent-length: 10\r\n\r\nHello TCP!");
   });

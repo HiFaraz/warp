@@ -10,11 +10,16 @@ CFLAGS := -std=c++14 -O2 -I $(INCLUDE) -pthread
 
 all: http tcp
 
-http:
+setup:
+	mkdir -p bin
+	scripts/include
+
+http: setup
 	$(CC) $(CFLAGS) $(SRC)/http-server.cc -o $(BIN)/warp-http
 
-tcp:
+tcp: setup
 	$(CC) $(CFLAGS) $(SRC)/tcp-server.cc -o $(BIN)/warp-tcp
 
 clean:
+	mkdir -p bin
 	rm -f bin/*

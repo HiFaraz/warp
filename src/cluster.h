@@ -6,7 +6,7 @@
 #include <unistd.h> // fork
 #include <vector> // std::vector
 
-#include "warp/console.h" // console
+#include <warp/console> // console
 
 /**
  * Cluster supports both simple forks and threads

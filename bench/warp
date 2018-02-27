@@ -24,10 +24,7 @@ function write() {
 echo
 write $BOLD "\bWarp micro-benchmark\n"
 
-# setup: clean build
-write $UNDERLINE "\bCleaning"
-rm -f build/*
-rm -f bin/*
+# setup
 write $UNDERLINE "\bCompiling\n"
 make $TARGET
 
