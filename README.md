@@ -1,7 +1,7 @@
 # FTL
 
 - C++ web server
-- Fast (90k-100k rps for Hello World)
+- Fast (90k-105k rps for Hello World)
 - Linux only
 
 How:
@@ -29,17 +29,17 @@ The benchmark scripts use `wrk`.
 
 FTL is very fast because it uses non-blocking I/O, edge-triggered polling, and 12 threads.
 
-A recent benchmark with `bench/ftl` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
+A recent benchmark with `bench/ftl tcp` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
 
 ```
-Running 10s test @ http://localhost:8080
+Running 20s test @ http://localhost:8080
   12 threads and 1000 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    10.57ms    9.95ms  99.08ms   71.38%
-    Req/Sec     8.49k     2.94k   39.13k    76.03%
-  1013099 requests in 10.09s, 36.71MB read
-Requests/sec: 100405.04
-Transfer/sec:      3.64MB
+    Latency    10.00ms    9.08ms 115.17ms   69.73%
+    Req/Sec     8.69k     2.68k   32.65k    72.74%
+  2072984 requests in 20.10s, 96.87MB read
+Requests/sec: 103141.58
+Transfer/sec:      4.82MB
 ```
 
 # Heroku
