@@ -22,12 +22,11 @@ namespace tcp {
       Server();
       ~Server();
 
-      void get_client_socket(std::function<void(Socket&)> cb);
       void listen(int port);
       void on_data(data_handler_t handler);
       void on_data(data_handler_lite_t handler);
 
-    private:
+    protected:
       data_handler_t      data_handler;
       data_handler_lite_t data_handler_lite;
       int                 event_count;
@@ -75,8 +74,8 @@ namespace tcp {
     }
   }
 
-  void Server::get_client_socket(std::function<void(Socket&)> cb) {
-    cb(client_socket);
+  void Server::get_buffer(std::function<void(Buffer&)> cb) {
+    cb(buffer);
   }
 
   void Server::handle_data() {

@@ -12,15 +12,14 @@ namespace http {
 
   using request_handler_t = std::function<void(Buffer&, Response&)>;
 
-  class Server : private tcp::Server {
+  class Server : public tcp::Server {
 
     public:
       using tcp::Server::listen;
       
       Server() {
         on_data(handle_data);
-        get_client_socket([this](tcp::Socket& socket) -> 
-          void { response.socket = &socket; });
+        response.socket = &client_socket;
       }
 
       void on_request(request_handler_t handler) {
