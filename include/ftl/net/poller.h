@@ -1,5 +1,5 @@
-#ifndef PHOTON_NET_POLLER_H
-#define PHOTON_NET_POLLER_H
+#ifndef FTL_NET_POLLER_H
+#define FTL_NET_POLLER_H
 
 #include <functional> // std::function
 #include <new> // std::nothrow
@@ -87,4 +87,4 @@ namespace net {
 
 }
 
-#endif // !PHOTON_NET_POLLER_H
+#endif // !FTL_NET_POLLER_H

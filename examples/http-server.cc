@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 
-#include "photon/core.h" // Buffer, console, env, event
-#include "photon/cluster.h" // cluster
-#include "photon/net.h" // http
+#include "ftl/core.h" // Buffer, console, env, event
+#include "ftl/cluster.h" // cluster
+#include "ftl/net.h" // http
 
 void start_server() {
   http::Server server;
@@ -21,7 +21,7 @@ void start_server() {
      * - operator<< (T input) : write(T input)
      */
 
-    res << "Hello world!\nMy name is Photon.";
+    res << "Hello HTTP!";
   });
 
   int port = env::get_int("PORT", 8080);

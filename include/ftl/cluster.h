@@ -1,12 +1,12 @@
-#ifndef PHOTON_CLUSTER_H
-#define PHOTON_CLUSTER_H
+#ifndef FTL_CLUSTER_H
+#define FTL_CLUSTER_H
 
 #include <functional> // std::function
 #include <thread> // std::thread
 #include <unistd.h> // fork
 #include <vector> // std::vector
 
-#include "photon/console.h" // console
+#include "ftl/console.h" // console
 
 /**
  * Cluster supports both simple forks and threads
@@ -63,4 +63,4 @@ namespace cluster {
 
 }
 
-#endif // !PHOTON_CLUSTER_H
+#endif // !FTL_CLUSTER_H

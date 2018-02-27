@@ -1,5 +1,5 @@
-#ifndef PHOTON_CONSOLE_H
-#define PHOTON_CONSOLE_H
+#ifndef FTL_CONSOLE_H
+#define FTL_CONSOLE_H
 
 #include <iostream>
 
@@ -17,4 +17,4 @@ namespace console {
 
 }
 
-#endif // !PHOTON_CONSOLE_H
+#endif // !FTL_CONSOLE_H

@@ -1,12 +1,12 @@
-#ifndef PHOTON_NET_HTTP_SERVER_H
-#define PHOTON_NET_HTTP_SERVER_H
+#ifndef FTL_NET_HTTP_SERVER_H
+#define FTL_NET_HTTP_SERVER_H
 
-#include "photon/event/loop.h" // event:Loop
-#include "photon/net/http/request.h" // http::Request
-#include "photon/net/http/response.h" // http::Response
-#include "photon/net/tcp/server.h" // tcp::Server
+#include "ftl/event/loop.h" // event:Loop
+#include "ftl/net/http/request.h" // http::Request
+#include "ftl/net/http/response.h" // http::Response
+#include "ftl/net/tcp/server.h" // tcp::Server
 
-#include "photon/net/http/message.h" // temp, move into request and response
+#include "ftl/net/http/message.h" // temp, move into request and response
 
 namespace http {
 
@@ -51,4 +51,4 @@ namespace http {
 
 }
 
-#endif // !PHOTON_NET_HTTP_SERVER_H
+#endif // !FTL_NET_HTTP_SERVER_H

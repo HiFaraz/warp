@@ -4,6 +4,8 @@
 # Utility code
 ##
 
+TARGET=$1
+
 CLEAR='\033[0m'
 BOLD='\033[1m'
 UNDERLINE='\033[4m'
@@ -20,31 +22,38 @@ function write() {
 ##
 
 echo
-write $BOLD "\bPhoton micro-benchmark\n"
+write $BOLD "\bFTL micro-benchmark\n"
 
 # setup: clean build
 write $UNDERLINE "\bCleaning"
-rm build/*
-rm bin/*
+rm -f build/*
+rm -f bin/*
 write $UNDERLINE "\bCompiling\n"
-make
+make $TARGET
 
 if [ $? -eq 0 ];then
   # benchmark
   echo
   export PORT=8080
-  write $UNDERLINE "\bBenchmarking"
+  write $UNDERLINE "\bStarting server"
   echo
-  bin/photon &
+  bin/ftl-$TARGET &
   sleep 0.5
   echo
-  wrk -t12 -c1000 -d10s http://localhost:8080
+  write $UNDERLINE "\bSample response"
+  echo
+  curl -i http://localhost:8080
+  echo
+  echo
+  write $UNDERLINE "\bBenchmarking"
+  echo
+  wrk -t12 -c1000 -d20s http://localhost:8080
 
   # teardown
   echo
   write $UNDERLINE "\bCleaning up"
   echo
-  pgrep photon | xargs kill
+  pgrep ftl-$TARGET | xargs kill
   echo
   write $GREEN $BOLD "\b\bFinished"
   echo

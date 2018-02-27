@@ -1,5 +1,5 @@
-#ifndef PHOTON_NET_HTTP_MESSAGE_H
-#define PHOTON_NET_HTTP_MESSAGE_H
+#ifndef FTL_NET_HTTP_MESSAGE_H
+#define FTL_NET_HTTP_MESSAGE_H
 
 #include <cstddef> // std::size_t
 
@@ -11,4 +11,4 @@ namespace http {
 
 }
 
-#endif // !PHOTON_NET_HTTP_MESSAGE_H
+#endif // !FTL_NET_HTTP_MESSAGE_H

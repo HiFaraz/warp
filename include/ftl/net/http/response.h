@@ -1,14 +1,13 @@
-#ifndef PHOTON_NET_HTTP_RESPONSE_H
-#define PHOTON_NET_HTTP_RESPONSE_H
+#ifndef FTL_NET_HTTP_RESPONSE_H
+#define FTL_NET_HTTP_RESPONSE_H
 
 #include <stdexcept>
 #include <string> // std::to_string
 
-#include "photon/buffer.h" // Buffer
-// #include "photon/net/http/headers.h" // Headers
-#include "photon/net/http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
-#include "photon/net/http/status.h" // Status
-#include "photon/net/tcp/socket.h" // tcp::Socket
+#include "ftl/buffer.h" // Buffer
+#include "ftl/net/http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
+#include "ftl/net/http/status.h" // Status
+#include "ftl/net/tcp/socket.h" // tcp::Socket
 
 namespace http {
 
@@ -73,4 +72,4 @@ namespace http {
 
 }
 
-#endif // !PHOTON_NET_HTTP_RESPONSE_H
+#endif // !FTL_NET_HTTP_RESPONSE_H

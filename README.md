@@ -1,8 +1,16 @@
-# Photon
+# FTL
 
-A decently fast Linux-only server written in C++. Does not support HTTP yet.
+- C++ web server
+- Fast (90k-100k rps for Hello World)
+- Linux only
 
-Uses non-blocking sockets, an event loop, and process forks for maximum concurrency.
+How:
+
+- Non-blocking sockets
+- Polling with epoll
+- Threads
+
+
 
 The "Hello world" example barely uses any memory and supports at least 1,000 connections.
 
@@ -12,15 +20,16 @@ The following micro-benchmarks can be run:
 
 ```
 bench/go
-bench/photon
+bench/ftl tcp
+bench/ftl http
 bench/nodejs
 ```
 
 The benchmark scripts use `wrk`.
 
-Photon is very fast because it uses non-blocking I/O, edge-triggered polling, and 12 threads.
+FTL is very fast because it uses non-blocking I/O, edge-triggered polling, and 12 threads.
 
-A recent benchmark with `bench/photon` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
+A recent benchmark with `bench/ftl` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
 
 ```
 Running 10s test @ http://localhost:8080

@@ -1,5 +1,5 @@
-#ifndef PHOTON_NET_HTTP_STATUS_H
-#define PHOTON_NET_HTTP_STATUS_H
+#ifndef FTL_NET_HTTP_STATUS_H
+#define FTL_NET_HTTP_STATUS_H
 
 #include <string> // std::string
 
@@ -61,4 +61,4 @@ namespace http {
   struct Status HTTP_VERSION_NOT_SUPPORTED = { 505, "HTTP Version Not Supported" };
 }
 
-#endif // !PHOTON_NET_HTTP_STATUS_H
+#endif // !FTL_NET_HTTP_STATUS_H

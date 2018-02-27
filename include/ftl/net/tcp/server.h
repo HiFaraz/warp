@@ -1,13 +1,13 @@
-#ifndef PHOTON_NET_TCP_SERVER_H
-#define PHOTON_NET_TCP_SERVER_H
+#ifndef FTL_NET_TCP_SERVER_H
+#define FTL_NET_TCP_SERVER_H
 
 #include <iostream> // std::cout, std::endl
 #include <functional> // std::function
 
-#include "photon/buffer.h" // Buffer
-#include "photon/event/loop.h" // event::poll_callback_t
-#include "photon/net/poller.h" // net::Poller
-#include "photon/net/tcp/socket.h" // ServerSocket, Socket
+#include "ftl/buffer.h" // Buffer
+#include "ftl/event/loop.h" // event::poll_callback_t
+#include "ftl/net/poller.h" // net::Poller
+#include "ftl/net/tcp/socket.h" // ServerSocket, Socket
 
 constexpr int MAX_EVENTS = 100000;
 
@@ -93,6 +93,6 @@ namespace tcp {
 
 }
 
-#endif // !PHOTON_NET_TCP_SERVER_H
+#endif // !FTL_NET_TCP_SERVER_H
 
       

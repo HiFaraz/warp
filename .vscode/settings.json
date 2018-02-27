@@ -31,6 +31,15 @@
     "type_traits": "cpp",
     "typeinfo": "cpp",
     "utility": "cpp",
-    "cmath": "cpp"
-  }
+    "cmath": "cpp",
+    "atomic": "cpp",
+    "bitset": "cpp",
+    "cstddef": "cpp",
+    "fstream": "cpp",
+    "mutex": "cpp",
+    "sstream": "cpp",
+    "ftl": "cpp",
+    "string": "cpp"
+  },
+  "eslint.enable": false
 }

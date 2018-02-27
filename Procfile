@@ -1,1 +1,1 @@
-web: ./bin/photon
+web: ./bin/ftl http

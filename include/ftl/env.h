@@ -1,5 +1,5 @@
-#ifndef PHOTON_ENV_H
-#define PHOTON_ENV_H
+#ifndef FTL_ENV_H
+#define FTL_ENV_H
 
 #include <cstdlib> // std::getenv
 #include <string> // std::stoi
@@ -17,4 +17,4 @@ namespace env {
 
 }
 
-#endif // !PHOTON_ENV_H
+#endif // !FTL_ENV_H

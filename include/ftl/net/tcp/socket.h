@@ -1,5 +1,5 @@
-#ifndef PHOTON_NET_TCP_SOCKET_H
-#define PHOTON_NET_TCP_SOCKET_H
+#ifndef FTL_NET_TCP_SOCKET_H
+#define FTL_NET_TCP_SOCKET_H
 
 #include <cstring> // memset
 #include <string> // std::string
@@ -12,8 +12,8 @@
 #include <netinet/in.h>
 #include <unistd.h> // close
 
-#include "photon/buffer.h" // Buffer
-#include "photon/console.h" // console
+#include "ftl/buffer.h" // Buffer
+#include "ftl/console.h" // console
 
 namespace tcp {
 
@@ -185,4 +185,4 @@ namespace tcp {
 
 }
 
-#endif // !PHOTON_NET_TCP_SOCKET_H
+#endif // !FTL_NET_TCP_SOCKET_H

@@ -1,5 +1,5 @@
-#ifndef PHOTON_EVENT_LOOP_H
-#define PHOTON_EVENT_LOOP_H
+#ifndef FTL_EVENT_LOOP_H
+#define FTL_EVENT_LOOP_H
 
 #include <functional> // std::function
 #include <vector> // std::vector
@@ -48,4 +48,4 @@ namespace event {
 
 }
 
-#endif // !PHOTON_EVENT_LOOP_H
+#endif // !FTL_EVENT_LOOP_H

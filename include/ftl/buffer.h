@@ -1,5 +1,5 @@
-#ifndef PHOTON_BUFFER_H
-#define PHOTON_BUFFER_H
+#ifndef FTL_BUFFER_H
+#define FTL_BUFFER_H
 
 #include <cstddef> // std::size_t
 #include <cstring> // memcpy, memset
@@ -62,4 +62,4 @@ std::ostream& operator<<(std::ostream& stream, const Buffer& buffer) {
   return stream;  
 }
 
-#endif // !PHOTON_BUFFER_H
+#endif // !FTL_BUFFER_H
