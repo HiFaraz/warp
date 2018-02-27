@@ -17,13 +17,40 @@ namespace http {
       struct Status status = OK;
 
       void end() {
-        writable = false;
+        flush_buffer();
       }
 
       template <typename T>
       void end(T input) {
         write(input);
         end();
+      }
+
+      void flush_buffer() {
+        // safe to call this function multiple times, because
+        // if exits if we have already had a successful write
+
+        if (!writable) {
+          console::log("exit flush early, not writable");
+          return;
+        }
+
+        // send whatever we have to the socket
+        // assume no chunked transfers for now, only one short
+        // therefore we can send the headers unconditionally
+        int err = socket->send(
+          std::string{get_status_line()} + new_ln()
+          + "Content-Length: " + std::to_string(buffer.size) + new_ln()
+          + headers.data
+          + new_ln()
+          + buffer.data
+        ) == -1;
+        
+        // TODO check that full buffer was sent
+
+        if (err) {
+          writable = false;
+        }
       }
 
       bool is_writable() const {
@@ -55,7 +82,7 @@ namespace http {
 
       Buffer      buffer{BUFSIZ};
       Buffer      headers{HTTP_MAX_HEADER_SIZE()};
-      tcp::Socket socket;
+      tcp::Socket* socket;
       bool        writable = true;
 
       std::string get_status_line(std::string http_version = "HTTP/1.1") const {

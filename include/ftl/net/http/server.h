@@ -19,6 +19,8 @@ namespace http {
       
       Server() {
         on_data(handle_data);
+        get_client_socket([this](tcp::Socket& socket) -> 
+          void { response.socket = &socket; });
       }
 
       void on_request(request_handler_t handler) {
@@ -29,19 +31,9 @@ namespace http {
       // allow event loop access to tcp::Server::poll_and_process
       friend class event::Loop;
 
-      tcp::data_handler_t handle_data = [this](Buffer& buffer, tcp::Socket& socket) -> void {
-        response.socket = socket;
+      tcp::data_handler_lite_t handle_data = [this](Buffer& buffer) -> void {
         request_handler(buffer, response);
-        
-        // TODO should be response.flush instead of socket.send
-        socket.send(
-          std::string{response.get_status_line()} + new_ln()
-          + "Content-Length: " + std::to_string(response.buffer.size) + new_ln()
-          + response.headers.data
-          + new_ln()
-          + response.buffer.data
-        );
-        // TODO check that full buffer was sent
+        response.end(); // may have already been called, but safe to call again
         response.reset();
       };
       Request           request;

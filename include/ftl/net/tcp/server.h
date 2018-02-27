@@ -14,15 +14,42 @@ constexpr int MAX_EVENTS = 100000;
 namespace tcp {
 
   using data_handler_t = std::function<void(Buffer&, Socket&)>;
+  using data_handler_lite_t = std::function<void(Buffer&)>;
   
   class Server {
 
+    public:
+      ~Server() {
+        server_socket.close();
+      }
+
+      Server() {
+        poller.add(server_socket.get_fd());
+      }
+
+      void get_client_socket(std::function<void(Socket&)> cb) {
+        cb(client_socket);
+      }
+
+      void listen(int port) {
+        server_socket.listen(port);
+      }
+
+      void on_data(data_handler_t handler) {
+        data_handler = handler;
+      }
+
+      void on_data(data_handler_lite_t handler) {
+        data_handler_lite = handler;
+      }
+
     private:
-      data_handler_t  data_handler;
-      int             event_count;
-      int             event_index;
-      net::Poller     poller{MAX_EVENTS};
-      ServerSocket    server_socket;
+      data_handler_t      data_handler;
+      data_handler_lite_t data_handler_lite;
+      int                 event_count;
+      int                 event_index;
+      net::Poller         poller{MAX_EVENTS};
+      ServerSocket        server_socket;
 
       // per-client variables, can be shared because messages
       // are handled in series within a thread
@@ -53,7 +80,11 @@ namespace tcp {
         } while (recv_size > 0);
 
         if (buffer.size > 0) {
-          data_handler(buffer, client_socket);
+          if (data_handler_lite != nullptr) {
+            data_handler_lite(buffer);
+          } else {
+            data_handler(buffer, client_socket);
+          }
         } else if (recv_size == 0) {
           poller.remove(poller.events[event_index].data.fd);
           close(poller.events[event_index].data.fd);
@@ -72,23 +103,6 @@ namespace tcp {
           }
         }
       };
-
-    public:
-      ~Server() {
-        server_socket.close();
-      }
-
-      Server() {
-        poller.add(server_socket.get_fd());
-      }
-
-      void listen(int port) {
-        server_socket.listen(port);
-      }
-
-      void on_data(data_handler_t handler) {
-        data_handler = handler;
-      }
   };
 
 }
