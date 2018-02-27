@@ -1,6 +1,6 @@
-# FTL
+# Warp
 
-- C++ web server
+- C++ web server framework
 - Fast (90k-105k rps for Hello World)
 - Linux only
 
@@ -20,16 +20,16 @@ The following micro-benchmarks can be run:
 
 ```
 bench/go
-bench/ftl tcp
-bench/ftl http
+bench/warp tcp
+bench/warp http
 bench/nodejs
 ```
 
 The benchmark scripts use `wrk`.
 
-FTL is very fast because it uses non-blocking I/O, edge-triggered polling, and 12 threads.
+Warp servers are very fast because Warp uses non-blocking I/O, edge-triggered polling, and 12 threads.
 
-A recent benchmark with `bench/ftl tcp` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
+A recent benchmark with `bench/warp tcp` on an `Intel(R) Core(TM) i3-2310M CPU @ 2.10GHz` machine with `6 GB DDR3 RAM` for a "Hello world" server.
 
 ```
 Running 20s test @ http://localhost:8080

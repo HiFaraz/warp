@@ -1,5 +1,5 @@
-#ifndef FTL_NET_HTTP_MESSAGE_H
-#define FTL_NET_HTTP_MESSAGE_H
+#ifndef WARP_NET_HTTP_MESSAGE_H
+#define WARP_NET_HTTP_MESSAGE_H
 
 #include <cstddef> // std::size_t
 
@@ -15,4 +15,4 @@ namespace http {
 
 }
 
-#endif // !FTL_NET_HTTP_MESSAGE_H
+#endif // !WARP_NET_HTTP_MESSAGE_H

@@ -1,5 +1,5 @@
-#ifndef FTL_BUFFER_H
-#define FTL_BUFFER_H
+#ifndef WARP_BUFFER_H
+#define WARP_BUFFER_H
 
 #include <cstddef> // std::size_t
 #include <cstring> // memcpy, memset
@@ -75,4 +75,4 @@ std::ostream& operator<<(std::ostream& stream, Buffer& buffer) {
   return stream;
 }
 
-#endif // !FTL_BUFFER_H
+#endif // !WARP_BUFFER_H

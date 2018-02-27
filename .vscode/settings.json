@@ -38,7 +38,7 @@
     "fstream": "cpp",
     "mutex": "cpp",
     "sstream": "cpp",
-    "ftl": "cpp",
+    "warp": "cpp",
     "string": "cpp"
   },
   "eslint.enable": false

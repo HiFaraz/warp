@@ -1,5 +1,5 @@
-#ifndef FTL_NET_POLLER_H
-#define FTL_NET_POLLER_H
+#ifndef WARP_NET_POLLER_H
+#define WARP_NET_POLLER_H
 
 #include <functional> // std::function
 #include <new> // std::nothrow
@@ -91,4 +91,4 @@ namespace net {
 
 }
 
-#endif // !FTL_NET_POLLER_H
+#endif // !WARP_NET_POLLER_H

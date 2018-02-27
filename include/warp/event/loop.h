@@ -1,5 +1,5 @@
-#ifndef FTL_EVENT_LOOP_H
-#define FTL_EVENT_LOOP_H
+#ifndef WARP_EVENT_LOOP_H
+#define WARP_EVENT_LOOP_H
 
 #include <functional> // std::function
 #include <vector> // std::vector
@@ -60,4 +60,4 @@ namespace event {
   }
 }
 
-#endif // !FTL_EVENT_LOOP_H
+#endif // !WARP_EVENT_LOOP_H

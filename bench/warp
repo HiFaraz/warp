@@ -22,7 +22,7 @@ function write() {
 ##
 
 echo
-write $BOLD "\bFTL micro-benchmark\n"
+write $BOLD "\bWarp micro-benchmark\n"
 
 # setup: clean build
 write $UNDERLINE "\bCleaning"
@@ -37,7 +37,7 @@ if [ $? -eq 0 ];then
   export PORT=8080
   write $UNDERLINE "\bStarting server"
   echo
-  bin/ftl-$TARGET &
+  bin/warp-$TARGET &
   sleep 0.5
   echo
   write $UNDERLINE "\bSample response"
@@ -53,7 +53,7 @@ if [ $? -eq 0 ];then
   echo
   write $UNDERLINE "\bCleaning up"
   echo
-  pgrep ftl-$TARGET | xargs kill
+  pgrep warp-$TARGET | xargs kill
   echo
   write $GREEN $BOLD "\b\bFinished"
   echo

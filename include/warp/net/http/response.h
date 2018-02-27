@@ -1,13 +1,13 @@
-#ifndef FTL_NET_HTTP_RESPONSE_H
-#define FTL_NET_HTTP_RESPONSE_H
+#ifndef WARP_NET_HTTP_RESPONSE_H
+#define WARP_NET_HTTP_RESPONSE_H
 
 #include <stdexcept>
 #include <string> // std::to_string
 
-#include "ftl/buffer.h" // Buffer
-#include "ftl/net/http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
-#include "ftl/net/http/status.h" // Status
-#include "ftl/net/tcp/socket.h" // tcp::Socket
+#include "warp/buffer.h" // Buffer
+#include "warp/net/http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
+#include "warp/net/http/status.h" // Status
+#include "warp/net/tcp/socket.h" // tcp::Socket
 
 namespace http {
 
@@ -123,4 +123,4 @@ namespace http {
 
 }
 
-#endif // !FTL_NET_HTTP_RESPONSE_H
+#endif // !WARP_NET_HTTP_RESPONSE_H

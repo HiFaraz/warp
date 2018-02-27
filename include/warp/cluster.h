@@ -1,12 +1,12 @@
-#ifndef FTL_CLUSTER_H
-#define FTL_CLUSTER_H
+#ifndef WARP_CLUSTER_H
+#define WARP_CLUSTER_H
 
 #include <functional> // std::function
 #include <thread> // std::thread
 #include <unistd.h> // fork
 #include <vector> // std::vector
 
-#include "ftl/console.h" // console
+#include "warp/console.h" // console
 
 /**
  * Cluster supports both simple forks and threads
@@ -63,4 +63,4 @@ namespace cluster {
 
 }
 
-#endif // !FTL_CLUSTER_H
+#endif // !WARP_CLUSTER_H

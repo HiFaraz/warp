@@ -1,5 +1,5 @@
-#ifndef FTL_CONSOLE_H
-#define FTL_CONSOLE_H
+#ifndef WARP_CONSOLE_H
+#define WARP_CONSOLE_H
 
 #include <iostream>
 
@@ -17,4 +17,4 @@ namespace console {
 
 }
 
-#endif // !FTL_CONSOLE_H
+#endif // !WARP_CONSOLE_H

@@ -1,5 +1,5 @@
-#ifndef FTL_ENV_H
-#define FTL_ENV_H
+#ifndef WARP_ENV_H
+#define WARP_ENV_H
 
 #include <cstdlib> // std::getenv
 #include <string> // std::stoi
@@ -17,4 +17,4 @@ namespace env {
 
 }
 
-#endif // !FTL_ENV_H
+#endif // !WARP_ENV_H

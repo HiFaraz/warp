@@ -1,5 +1,5 @@
-#ifndef FTL_NET_TCP_SOCKET_H
-#define FTL_NET_TCP_SOCKET_H
+#ifndef WARP_NET_TCP_SOCKET_H
+#define WARP_NET_TCP_SOCKET_H
 
 #include <cstring> // memset
 #include <string> // std::string
@@ -12,8 +12,8 @@
 #include <netinet/in.h>
 #include <unistd.h> // close
 
-#include "ftl/buffer.h" // Buffer
-#include "ftl/console.h" // console
+#include "warp/buffer.h" // Buffer
+#include "warp/console.h" // console
 
 namespace tcp {
 
@@ -213,4 +213,4 @@ namespace tcp {
 
 }
 
-#endif // !FTL_NET_TCP_SOCKET_H
+#endif // !WARP_NET_TCP_SOCKET_H
