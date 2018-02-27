@@ -16,70 +16,20 @@ namespace http {
     public:
       struct Status status = OK;
 
-      void end() {
-        writable = false;
-      }
+      void end();
 
       template <typename T>
-      void end(T input) {
-        write(input);
-        end();
-      }
-
-      void flush_buffer() {
-        // safe to call this function multiple times, because
-        // if exits if we have already had a successful send
-
-        if (sent) {
-          // console::log("exit flush early, already sent");
-          return;
-        }
-
-        // send whatever we have to the socket
-        // assume no chunked transfers for now, only one short
-        // therefore we can send the headers unconditionally
-        int err = socket->send(
-          std::string{get_status_line()} + new_ln()
-          + "Content-Length: " + std::to_string(buffer.size) + new_ln()
-          + headers.data
-          + new_ln()
-          + buffer.data
-        ) == -1;
-        
-        // TODO check that full buffer was sent
-
-        if (!err) {
-          sent = true;
-        }
-        }
-
-      bool is_sent() const {
-        return sent;
-      }
-
-      bool is_writable() const {
-        return writable;
-      }
-
-      void set(std::string header_name, std::string value) {
-        headers << header_name + ": " + value + new_ln();
-      }
+      void end(T input);
+      void flush_buffer();
+      auto is_sent() const;
+      auto is_writable() const;
+      void set(std::string header_name, std::string value);
 
       template <typename T>
-      void write(T input) {
-        if (writable) {
-          buffer << input;
-          // TODO handle errors where input would overflow the buffer
-        } else {
-          throw std::runtime_error{"Cannot write to closed HTTP response stream"};
-        }
-      }
+      void write(T input);
 
       template <typename T>
-      Response& operator<<(T input) {
-        write(input);
-        return *this;
-      }
+      Response& operator<<(T input);
 
     private:
       friend class Server;
@@ -90,18 +40,86 @@ namespace http {
       tcp::Socket*  socket;
       bool          writable = true;
 
-      std::string get_status_line(std::string http_version = "HTTP/1.1") const {
-        return http_version + " " + std::to_string(status.code) + " " + status.description;
-      }
-
-      void reset() {
-        buffer.empty();
-        headers.empty();
-        sent = false;
-        status = OK;
-        writable = true;
-      }
+      auto get_status_line(std::string http_version = "HTTP/1.1") const;
+      void reset();
   };
+
+  void Response::end() {
+    writable = false;
+  }
+
+  template <typename T>
+  void Response::end(T input) {
+    write(input);
+    end();
+  }
+
+  auto Response::get_status_line(std::string http_version) const {
+    return http_version + " " + std::to_string(status.code) + " " + status.description;
+  }
+
+  void Response::flush_buffer() {
+    // safe to call this function multiple times, because
+    // if exits if we have already had a successful send
+
+    if (sent) {
+      // console::log("exit flush early, already sent");
+      return;
+    }
+
+    // send whatever we have to the socket
+    // assume no chunked transfers for now, only one short
+    // therefore we can send the headers unconditionally
+    auto err = socket->send(
+      std::string{get_status_line()} + new_ln()
+      + "Content-Length: " + std::to_string(buffer.size) + new_ln()
+      + headers.data
+      + new_ln()
+      + buffer.data
+    ) == -1;
+    
+    // TODO check that full buffer was sent
+
+    if (!err) {
+      sent = true;
+    }
+  }
+
+  auto Response::is_sent() const {
+    return sent;
+  }
+
+  auto Response::is_writable() const {
+    return writable;
+  }
+
+  void Response::reset() {
+    buffer.empty();
+    headers.empty();
+    sent = false;
+    status = OK;
+    writable = true;
+  }
+
+  void Response::set(std::string header_name, std::string value) {
+    headers << header_name + ": " + value + new_ln();
+  }
+
+  template <typename T>
+  void Response::write(T input) {
+    if (writable) {
+      buffer << input;
+      // TODO handle errors where input would overflow the buffer
+    } else {
+      throw std::runtime_error{"Cannot write to closed HTTP response stream"};
+    }
+  }
+
+  template <typename T>
+  Response& Response::operator<<(T input) {
+    write(input);
+    return *this;
+  }
 
 }
 
