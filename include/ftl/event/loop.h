@@ -10,42 +10,54 @@ namespace event {
 
   class Loop {
     
-    private:
-      bool                    running = false;
-      std::vector<poll_callback_t> polls;
-
-    void run_polls() {
-      for(poll_callback_t& cb : polls) {
-        cb();
-      }
-    }
-
-    void loop() {
-      while(running) {
-        run_polls();
-      }
-    }
-
     public:
       template <class T>
-      void add(T& event_provider) {
-        this->push_poll(event_provider.poll_and_process);
-      }
+      void add(T& event_provider);
 
-      void push_poll(poll_callback_t cb) {
-        polls.push_back(cb);
-      }
+      void push_poll(poll_callback_t cb);
 
-      void start() {
-        running = true;
-        loop();
-      }
+      void start();
 
-      void stop() {
-        running = false;
-      }
+      void stop();
+    
+    private:
+      bool                         running = false;
+      std::vector<poll_callback_t> polls;
+
+      void loop();
+
+      void run_polls();
   };
 
+  template <class T>
+  void Loop::add(T& event_provider) {
+    this->push_poll(event_provider.poll_and_process);
+  }
+
+  void Loop::loop() {
+    while(running) {
+      run_polls();
+    }
+  }
+
+  void Loop::push_poll(poll_callback_t cb) {
+    polls.push_back(cb);
+  }
+
+  void Loop::run_polls() {
+    for(auto& cb : polls) {
+      cb();
+    }
+  }
+
+  void Loop::start() {
+    running = true;
+    loop();
+  }
+
+  void Loop::stop() {
+    running = false;
+  }
 }
 
 #endif // !FTL_EVENT_LOOP_H
