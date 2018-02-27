@@ -87,7 +87,7 @@ namespace tcp {
       }
 
       ssize_t recv(Buffer& buffer) {
-        return ::recv(fd, buffer.data, buffer.capacity, 0);
+        return ::recv(fd, buffer.data + buffer.size, buffer.capacity - buffer.size, 0);
       }
 
       ssize_t send(const char* message) {
