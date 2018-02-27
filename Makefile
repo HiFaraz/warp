@@ -8,11 +8,13 @@ SRC := examples
 CC := g++
 CFLAGS := -std=c++14 -O2 -I $(INCLUDE) -pthread
 
-all: http tcp
+all: setup
 
 setup:
 	mkdir -p bin
 	scripts/include
+
+examples: http tcp
 
 http: setup
 	$(CC) $(CFLAGS) $(SRC)/http-server.cc -o $(BIN)/warp-http
