@@ -17,7 +17,7 @@ all: setup
 ##
 
 examples: http tcp
-	@echo "\n\033[0;32mExamples built\033[0m"
+	echo "\n\033[0;32mExamples built\033[0m"
 
 http: setup
 	$(CC) $(CFLAGS) $(SRC)/http-server.cc -o $(BIN)/warp-http
@@ -41,11 +41,12 @@ add-dirs:
 	@echo "\033[0;32mBuild directories added\033[0m"
 
 add-deps: picohttpparser
-	@echo "\033[0;32mGit submodules added\033[0m"
+	@echo "\033[0;32mDependencies added\033[0m"
 
 picohttpparser:
-	@scripts/submodule add picohttpparser https://github.com/h2o/picohttpparser 2a16b2365ba30b13c218d15ed9991576358a6337
-	cd $(DEPS)/picohttpparser; $(CC) $(CFLAGS) -c picohttpparser.c
+	@scripts/deps add picohttpparser https://github.com/h2o/picohttpparser 2a16b2365ba30b13c218d15ed9991576358a6337
+	@echo "Building library"
+	@cd $(DEPS)/picohttpparser; $(CC) $(CFLAGS) -c picohttpparser.c
 	@ar -cvq $(LIB)/libpicohttpparser.a $(DEPS)/picohttpparser/picohttpparser.o
 	@cp deps/picohttpparser/picohttpparser.h src
 	@echo "\033[0;32mpicohttpparser added\033[0m"
@@ -64,6 +65,7 @@ rm-dirs:
 	@echo "\033[0;32mBuild directories removed\033[0m"
 
 rm-deps:
-	@scripts/submodule rm picohttpparser
+	@scripts/deps rm picohttpparser
+	@rm src/picohttpparser.h
 	@rm -r -f deps
-	@echo "\n\033[0;32mGit submodules removed\033[0m"
+	@echo "\n\033[0;32mDependencies removed\033[0m"

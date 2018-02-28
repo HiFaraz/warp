@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+COMMAND=$1
+NAME=$2
+GITURL=$3
+COMMIT=$4
+
+DEPS="deps"
+
+if [ "$COMMAND" == "add" ]; then
+  echo "Adding dep: $NAME"
+  git clone --depth 1 "$GITURL" "$DEPS/$NAME"
+  cd "$DEPS/$NAME"
+  git checkout "$COMMIT"
+  cd ..
+elif [ "$COMMAND" == "rm" ]; then
+  # currently does nothing, because the Makefile removes the entire deps folder
+  echo "Removing dep: $NAME"
+fi
