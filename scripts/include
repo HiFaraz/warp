@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-mkdir -p include
-mkdir -p include
-rm -r -f include/*
 cp -r src/* include
 find include/warp -name "*.h" -exec sed -i 's/#include "warp\/\(.*\).h"/#include <warp\/\1>/g' {} +
 find include/warp -name "*.h" -exec bash -c 'mv "$1" "${1%.h}"' - '{}' \;
