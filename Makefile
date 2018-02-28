@@ -8,7 +8,8 @@ SRC := examples
 
 # Compiler
 CC := g++
-CFLAGS := -std=c++14 -O2 -I $(INCLUDE) -pthread -L $(LIB) -lpicohttpparser
+CFLAGS := -std=c++14 -O2 -I $(INCLUDE) -pthread
+LFLAGS := -L $(LIB) -lpicohttpparser
 
 all: setup
 
@@ -17,13 +18,13 @@ all: setup
 ##
 
 examples: http tcp
-	echo "\n\033[0;32mExamples built\033[0m"
+	@echo "\n\033[0;32mExamples built\033[0m"
 
 http: setup
-	$(CC) $(CFLAGS) $(SRC)/http-server.cc -o $(BIN)/warp-http
+	$(CC) $(CFLAGS) $(SRC)/http-server.cc $(LFLAGS) -o $(BIN)/warp-http
 
 tcp: setup
-	$(CC) $(CFLAGS) $(SRC)/tcp-server.cc -o $(BIN)/warp-tcp
+	$(CC) $(CFLAGS) $(SRC)/tcp-server.cc $(LFLAGS) -o $(BIN)/warp-tcp
 
 ##
 # SETUP
