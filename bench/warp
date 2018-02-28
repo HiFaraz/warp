@@ -50,7 +50,7 @@ if [ $? -eq 0 ];then
   echo
   write $UNDERLINE "\bCleaning up"
   echo
-  pgrep warp-$TARGET | xargs kill
+  eval "pgrep warp-$TARGET | xargs kill"
   echo
   write $GREEN $BOLD "\b\bFinished"
   echo
