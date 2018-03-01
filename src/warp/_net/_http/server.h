@@ -8,6 +8,8 @@
 
 #include "warp/_net/_http/message.h" // temp, move into request and response
 
+using Buffer = warp::source_buffer;
+
 namespace http {
 
   using request_handler_t = std::function<void(Buffer&, Response&)>;
@@ -19,7 +21,6 @@ namespace http {
       
       Server() {
         on_data(handle_data);
-        // request.buffer = &buffer;
       }
 
       void on_request(request_handler_t handler) {

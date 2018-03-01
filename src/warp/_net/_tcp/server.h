@@ -11,8 +11,9 @@
 
 constexpr auto MAX_EVENTS = 100000;
 
-namespace tcp {
+using Buffer = warp::source_buffer;
 
+namespace tcp {
   using data_handler_t = std::function<void(Buffer&, Socket&)>;
   using data_handler_lite_t = std::function<void(Buffer&)>;
   
@@ -77,16 +78,18 @@ namespace tcp {
   void Server::handle_data() {
     // reset variables
     // we do not reset buffer, instead we pass the buffer content size to the callback
-    buffer.size = 0;
+    buffer.clear();
+    auto total_size = 0;
     auto recv_size = 0;
 
     do {
-      buffer.size += recv_size;
+      total_size += recv_size;
+      buffer.resize(total_size);
       recv_size = client_socket.recv(buffer);
       // std::cout << "recv " << recv_size << " bytes" << std::endl;
     } while (recv_size > 0);
 
-    if (buffer.size > 0) {
+    if (buffer.size() > 0) {
       if (data_handler_lite != nullptr) {
         data_handler_lite(buffer);
       } else {

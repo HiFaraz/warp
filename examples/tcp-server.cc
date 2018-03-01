@@ -8,6 +8,7 @@
 void start_server() {
   auto server = tcp::Server{};
 
+  // TODO make this a read only buffer
   server.on_data([](auto& buffer, auto& socket){
 
     /**
@@ -17,10 +18,7 @@ void start_server() {
      *  Methods:
      * 
      *   - Buffer{int capacity}
-     *   - empty()
-     *   - fill(int filler)
-     *   - operator<< (Tw input)
-     *   - ostream<< (Buffer& buffer)
+     *   - clear()
      * 
      * tcp::Socket socket <warp/net>
      * ==================
@@ -31,8 +29,7 @@ void start_server() {
      *   - recv(Buffer&)
      *   - send(Buffer& | string | const char*)
      */
-
-    // console::log(buffer);
+    // console::log(buffer.to_string());
     socket.send("HTTP/1.1 200 OK\r\nContent-length: 10\r\n\r\nHello TCP!");
   });
 

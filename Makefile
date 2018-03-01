@@ -5,6 +5,7 @@ DEPS := deps
 INCLUDE := include
 LIB := lib
 SRC := examples
+TESTS := tests
 
 # Compiler
 CC := g++
@@ -15,9 +16,10 @@ all: warp
 
 help:
 	@echo "\n\033[1mWarp Makefile usage:\033[0m\n"
-	@echo "\033[1mmake\033[0m\t\tBuilds Warp\n\t\t(installs dependencies and creates Warp include files)"
-	@echo "\033[1mmake examples\033[0m\tBuilds Warp examples"
-	@echo "\033[1mmake clean\033[0m\tRemoves builds and dependencies"
+	@echo "\033[1mmake\033[0m\t\tBuild Warp\n\t\t(install dependencies and create Warp include files)"
+	@echo "\033[1mmake clean\033[0m\tRemove all build artifacts"
+	@echo "\033[1mmake examples\033[0m\tBuild examples"
+	@echo "\033[1mmake test\033[0m\tRuns tests"
 	@echo
 
 ##
@@ -34,6 +36,16 @@ tcp: warp
 	$(CC) $(CFLAGS) $(SRC)/tcp-server.cc $(LFLAGS) -o $(BIN)/warp-tcp
 
 ##
+# TESTS
+##
+
+test: buffer
+	@echo "\n\033[0;32mTests passed.\033[0m"
+
+buffer: warp
+	$(CC) $(CFLAGS) $(TESTS)/buffer.cc $(LFLAGS) -o $(BIN)/tests/buffer
+	$(BIN)/tests/buffer
+##
 # SETUP
 ##
 
@@ -45,10 +57,11 @@ includes:
 	@echo "\033[0;32mInclude files created.\033[0m"
 
 dirs:
-	@mkdir -p bin
-	@mkdir -p deps
-	@mkdir -p include
-	@mkdir -p lib
+	@mkdir -p $(BIN)
+	@mkdir -p $(BIN)/tests
+	@mkdir -p $(DEPS)
+	@mkdir -p $(INCLUDE)
+	@mkdir -p $(LIB)
 	@echo "\033[0;32mBuild directories added.\033[0m"
 
 deps: picohttpparser

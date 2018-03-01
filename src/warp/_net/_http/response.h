@@ -9,6 +9,8 @@
 #include "warp/_net/_http/status.h" // Status
 #include "warp/_net/_tcp/socket.h" // tcp::Socket
 
+using Buffer = warp::source_buffer;
+
 namespace http {
 
   class Response {
@@ -34,11 +36,10 @@ namespace http {
     private:
       friend class Server;
 
-      Buffer        buffer{BUFSIZ};
-      Buffer        headers{HTTP_MAX_HEADER_SIZE()};
-      bool          sent = false;
-      // tcp::Socket&  socket;
-      bool          writable = true;
+      Buffer  body{BUFSIZ};
+      Buffer  headers{HTTP_MAX_HEADER_SIZE()};
+      bool    sent = false;
+      bool    writable = true;
 
       auto get_status_line(std::string http_version = "HTTP/1.1") const;
       void reset();
@@ -72,10 +73,10 @@ namespace http {
     // therefore we can send the headers unconditionally
     auto err = socket.send(
       std::string{get_status_line()} + new_ln()
-      + "Content-Length: " + std::to_string(buffer.size) + new_ln()
-      + headers.data
+      + "Content-Length: " + std::to_string(body.size()) + new_ln()
+      + headers.to_string()
       + new_ln()
-      + buffer.data
+      + body.data() // consider size!
     ) == -1;
     
     // TODO check that full buffer was sent
@@ -94,21 +95,21 @@ namespace http {
   }
 
   void Response::reset() {
-    buffer.empty();
-    headers.empty();
+    body.clear();
+    headers.clear();
     sent = false;
     status = OK;
     writable = true;
   }
 
   void Response::set(std::string header_name, std::string value) {
-    headers << header_name + ": " + value + new_ln();
+    headers.append(header_name + ": " + value + new_ln());
   }
 
   template <typename T>
   void Response::write(T input) {
     if (writable) {
-      buffer << input;
+      body.append(input);
       // TODO handle errors where input would overflow the buffer
     } else {
       throw std::runtime_error{"Cannot write to closed HTTP response stream"};

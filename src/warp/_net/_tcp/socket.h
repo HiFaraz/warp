@@ -15,6 +15,8 @@
 #include "warp/buffer.h" // Buffer
 #include "warp/console.h" // console
 
+using Buffer = warp::source_buffer;
+
 namespace tcp {
 
   class BaseSocket {
@@ -125,7 +127,7 @@ namespace tcp {
   }
 
   auto Socket::recv(Buffer& buffer) {
-    return ::recv(fd, buffer.data + buffer.size, buffer.capacity - buffer.size, 0);
+    return ::recv(fd, buffer.data(), buffer.capacity() - buffer.size(), 0);
   }
 
   auto Socket::send(const char* message) {
@@ -133,7 +135,7 @@ namespace tcp {
   }
 
   auto Socket::send(Buffer& buffer) {
-    return ::send(fd, buffer.data, buffer.size, 0);
+    return ::send(fd, buffer.data(), buffer.size(), 0);
   }
 
   auto Socket::send(std::string message) {

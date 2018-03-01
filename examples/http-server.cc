@@ -34,13 +34,14 @@ void start_server() {
      * 
      *  Methods:
      *   - end() | end(T input)
+     *   - is_sent()
      *   - is_writable()
      *   - set([std::string|const char*] header_name, [std::string|const char*] value)
      *   - http::Status status
      *   - write(T input)
-     *   - operator<< (T input) : write(T input)
+     *   - operator<< (T input)
      */
-
+    console::log(buffer.to_string());
     res << "Hello HTTP!";
   });
 

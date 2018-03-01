@@ -1,78 +1,128 @@
 #ifndef WARP_BUFFER_H
 #define WARP_BUFFER_H
 
+#include <algorithm> // std::copy_n
 #include <cstddef> // std::size_t
-#include <cstring> // memcpy, memset
+#include <cstring> // std::strlen
 #include <iostream> // std::ostream
-#include <stdexcept>
+#include <stdexcept> // std::out_of_range
 #include <string> // std::string
+#include <vector> // std::vector
 
-class Buffer {
-  
-  public:
-    char* data;
-    std::size_t capacity;
-    std::size_t size;
+namespace warp {
 
-    Buffer(std::size_t capacity) : capacity(capacity) {
-      data = new char[capacity];
-      size = 0;
-    };
+  class const_buffer {
 
-    Buffer (std::size_t size, int filler) : Buffer(size) {
-      fill(filler);
-    }
+    public:
+      char const * const  data_;
+      std::size_t         size_;
 
-    void append(const char* input);
-    void append(const std::string input);
-    void append(const Buffer& buffer);
-    void empty();
-    void fill(const int filler);
-    char operator[](const std::size_t index);
+      const_buffer(const char * const data, std::size_t size)
+       : data_(data), size_(size) {}
+      auto slice(std::size_t from, std::size_t to) const;
+      auto to_string() const;
+  };
 
-    template <typename T>
-    Buffer& operator<<(const T input);
-};
-
-void Buffer::append(const char* input) {
-  size_t input_size = strlen(input);
-  size_t free_space = capacity - size;
-  if (free_space < input_size) {
-    throw std::runtime_error{"Not enough space in Buffer, flush the buffer first"};
+  auto const_buffer::slice(std::size_t from, std::size_t to) const {
+    return const_buffer{data_ + from, to - from};
   }
-  memcpy(data + size, input, input_size);
-  size += input_size;
-}
 
-void Buffer::append(const std::string input) {
-  append(input.c_str());
-}
+  auto const_buffer::to_string() const {
+    return std::string(data_, size_);
+  }
 
-void Buffer::append(const Buffer& buffer) {
-  append(buffer.data);
-}
+  class source_buffer {
 
-void Buffer::empty() {
-  size = 0;
-}
+    using buffer_t = std::vector<char>;
+    
+    public:
+      source_buffer(std::size_t capacity)
+      : data_(buffer_t(capacity)) {
+        clear();
+      };
 
-void Buffer::fill(const int filler) {
-  memset(data, filler, size);
-}
+      void append(const char* input, int num_bytes = -1);
+      void append(const std::string input);
+      auto capacity() const;
+      void clear();
+      auto cursor(); // get pointer to end of data
+      auto data();
+      void resize(std::size_t new_size);
+      auto size() const;
+      auto slice(std::size_t from, std::size_t to) const;
+      auto to_string() const;
 
-char Buffer::operator[](const std::size_t index) {
-  return data[index];
-}
+      void inspect() const;
 
-template <typename T>
-Buffer& Buffer::operator<<(const T input) {
-  append(input);
-  return *this;
-}
+    private:
+      buffer_t data_;
+      std::size_t size_ = 0;
+  };
 
-std::ostream& operator<<(std::ostream& stream, Buffer& buffer) {  
-  stream << buffer.data;
-  return stream;
+  auto source_buffer::capacity() const {
+    return data_.capacity();
+  }
+
+  void source_buffer::clear() {
+    // data_.clear();
+    size_ = 0;
+  }
+
+  auto source_buffer::data() {
+    return data_.data();
+    // return &data_[0];
+  }
+
+  auto source_buffer::size() const {
+    // return data_.size();
+    return size_;
+  }
+
+  auto source_buffer::cursor() {
+    return data() + size_;
+  }
+
+  auto source_buffer::slice(std::size_t from, std::size_t to) const {
+    return const_buffer{&data_[0] + from, to - from};
+  }
+
+  auto source_buffer::to_string() const {
+    return std::string(data_.data(), size());
+  }
+
+  void source_buffer::append(const char* input, int num_bytes) {
+    auto input_size = num_bytes == -1 ? std::strlen(input) : num_bytes;
+    auto free_space = capacity() - size();
+    if (free_space < input_size) {
+      data_.reserve(size() + input_size);
+    }
+    auto pos = cursor();
+    resize(size() + input_size);
+    std::copy_n(input, input_size, pos);
+  }
+
+  void source_buffer::append(const std::string input) {
+    append(input.c_str());
+  }
+
+  void source_buffer::resize(std::size_t new_size) {
+    size_ = new_size;
+  }
+
+  void source_buffer::inspect() const {
+    std::cout << "Buffer inspect: {" << std::endl;
+    std::cout << "  capacity(): " << capacity() << std::endl;
+    std::cout << "  data(): " << data_.data() << std::endl;
+    std::cout << "  size(): " << size() << std::endl;
+    std::cout << "  to_string(): " << to_string() << std::endl;
+    std::cout << "}" << std::endl;
+  }
+
+  // std::ostream& operator<<(std::ostream& stream, source_buffer& buffer) {  
+  //   stream << buffer.to_string();
+  //   return stream;
+  // }
+
 }
 
 #endif // !WARP_BUFFER_H
