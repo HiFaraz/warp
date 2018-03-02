@@ -1,47 +1,47 @@
 #ifndef WARP_NET_HTTP_SERVER_H
 #define WARP_NET_HTTP_SERVER_H
 
-#include "warp/_event/loop.h" // event:Loop
-#include "warp/_net/_http/request.h" // http::Request
-#include "warp/_net/_http/response.h" // http::Response
-#include "warp/_net/_tcp/server.h" // tcp::Server
+#include "warp/_event/loop.h" // event:loop
+#include "warp/_net/_http/request.h" // http::request
+#include "warp/_net/_http/response.h" // http::response
+#include "warp/_net/_tcp/server.h" // tcp::server
 
-#include "warp/_net/_http/message.h" // temp, move into request and response
+namespace warp {
 
-using Buffer = warp::source_buffer;
+  namespace http {
 
-namespace http {
+    using request_handler_t = std::function<void(source_buffer&, response&)>;
 
-  using request_handler_t = std::function<void(Buffer&, Response&)>;
+    class server : public tcp::server {
 
-  class Server : public tcp::Server {
+      public:
+        using warp::tcp::server::listen;
+        
+        server() {
+          on_data(handle_data_);
+        }
 
-    public:
-      using tcp::Server::listen;
-      
-      Server() {
-        on_data(handle_data);
-      }
+        void on_request(request_handler_t handler) {
+          request_handler_ = handler;
+        }
 
-      void on_request(request_handler_t handler) {
-        request_handler = handler;
-      }
+      private:
+        // allow event loop access to tcp::server::poll_and_process
+        friend class event::loop;
+        friend class request;
+        friend class response;
 
-    private:
-      // allow event loop access to tcp::Server::poll_and_process
-      friend class event::Loop;
-      friend class Request;
-      friend class Response;
+        tcp::data_handler_lite_t handle_data_ = [this](source_buffer& buffer) -> void {
+          request_handler_(buffer, response_);
+          response_.flush_buffer_to_(client_socket_);
+          response_.reset_();
+        };
+        request           request_;
+        request_handler_t request_handler_;
+        response          response_;
+    };
 
-      tcp::data_handler_lite_t handle_data = [this](Buffer& buffer) -> void {
-        request_handler(buffer, response);
-        response.flush_buffer_to(client_socket);
-        response.reset();
-      };
-      Request           request;
-      request_handler_t request_handler;
-      Response          response;
-  };
+  }
 
 }
 

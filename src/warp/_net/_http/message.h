@@ -3,14 +3,18 @@
 
 #include <cstddef> // std::size_t
 
-namespace http {
+namespace warp {
 
-  auto new_ln() {
-    return "\r\n";
-  }
+  namespace http {
 
-  const auto HTTP_MAX_HEADER_SIZE() {
-    return std::size_t{8 * 1024};// 8 KiB
+    auto new_ln() {
+      return "\r\n";
+    }
+
+    const auto HTTP_MAX_HEADER_SIZE() {
+      return std::size_t{8 * 1024};// 8 KiB
+    }
+
   }
 
 }

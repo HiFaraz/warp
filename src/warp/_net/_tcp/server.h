@@ -4,113 +4,119 @@
 #include <iostream> // std::cout, std::endl
 #include <functional> // std::function
 
-#include "warp/buffer.h" // Buffer
+#include "warp/buffer.h" // source_buffer
 #include "warp/_event/loop.h" // event::poll_callback_t
-#include "warp/_net/poller.h" // net::Poller
-#include "warp/_net/_tcp/socket.h" // ServerSocket, Socket
+#include "warp/_net/poller.h" // poller
+#include "warp/_net/_tcp/socket.h" // server_socket, socket
 
 constexpr auto MAX_EVENTS = 100000;
 
-using Buffer = warp::source_buffer;
+namespace warp {
 
-namespace tcp {
-  using data_handler_t = std::function<void(Buffer&, Socket&)>;
-  using data_handler_lite_t = std::function<void(Buffer&)>;
-  
-  class Server {
+  namespace tcp {
 
-    public:
-      Server();
-      ~Server();
+    using data_handler_t = std::function<void(source_buffer&, socket&)>;
+    using data_handler_lite_t = std::function<void(source_buffer&)>;
+    
+    class server {
 
-      void listen(int port);
-      void on_data(data_handler_t handler);
-      void on_data(data_handler_lite_t handler);
+      public:
+        server();
+        ~server();
 
-    protected:
-      data_handler_t      data_handler;
-      data_handler_lite_t data_handler_lite;
-      int                 event_count;
-      int                 event_index;
-      net::Poller         poller{MAX_EVENTS};
-      ServerSocket        server_socket;
+        void listen(int port);
+        void on_data(data_handler_t handler);
+        void on_data(data_handler_lite_t handler);
 
-      // per-client variables, can be shared because messages
-      // are handled in series within a thread
-      Buffer buffer{BUFSIZ};
-      Socket client_socket;
+      protected:
+        data_handler_t      data_handler_;
+        data_handler_lite_t data_handler_lite_;
+        int                 event_count_;
+        int                 event_index_;
+        net::poller         poller_{MAX_EVENTS};
+        server_socket       server_socket_;
 
-      void accept();
-      void handle_data(); // TODO support request pipelining
+        // per-client variables, can be shared because messages
+        // are handled in series within a thread
+        source_buffer       buffer_{BUFSIZ};
+        socket              client_socket_;
 
-      friend class event::Loop;
-      event::poll_callback_t poll_and_process = [this]() -> void {
-        event_count = poller.wait();
-        for (event_index = 0; event_index < event_count; ++event_index) {
-          if (poller.events[event_index].data.fd == server_socket.get_fd()) {
-            accept();
-          } else {
-            client_socket.set_fd(poller.events[event_index].data.fd);
-            handle_data();
+        void accept_();
+        void handle_event_(); // TODO support request pipelining
+
+        friend class event::loop;
+        event::poll_callback_t poll_and_process_ = [this]() -> void {
+          event_count_ = poller_.wait();
+          for (event_index_ = 0; event_index_ < event_count_; ++event_index_) {
+            if (poller_.events[event_index_].data.fd == server_socket_.get_fd()) {
+              accept_();
+            } else {
+              client_socket_.set_fd(poller_.events[event_index_].data.fd);
+              handle_event_();
+            }
           }
+        };
+    };
+
+    server::server() {
+      poller_.add(server_socket_.get_fd());
+    }
+
+    server::~server() {
+      server_socket_.close();
+    }
+
+    void server::accept_() {
+      while(true) {
+        try {
+          poller_.add(server_socket_.accept());
+        } catch (...) {
+          break;
         }
-      };
-  };
-
-  Server::Server() {
-    poller.add(server_socket.get_fd());
-  }
-
-  Server::~Server() {
-    server_socket.close();
-  }
-
-  void Server::accept() {
-    while(true) {
-      try {
-        poller.add(server_socket.accept());
-      } catch (...) {
-        break;
       }
     }
-  }
 
-  void Server::handle_data() {
-    // reset variables
-    // we do not reset buffer, instead we pass the buffer content size to the callback
-    buffer.clear();
-    auto total_size = 0;
-    auto recv_size = 0;
+    void server::handle_event_() {
+      auto total_size = 0;
+      auto recv_size = 0;
 
-    do {
-      total_size += recv_size;
-      buffer.resize(total_size);
-      recv_size = client_socket.recv(buffer);
-      // std::cout << "recv " << recv_size << " bytes" << std::endl;
-    } while (recv_size > 0);
+      do {
+        total_size += recv_size;
+        buffer_.resize(total_size); // N.B. on first loop, clears buffer
 
-    if (buffer.size() > 0) {
-      if (data_handler_lite != nullptr) {
-        data_handler_lite(buffer);
-      } else {
-        data_handler(buffer, client_socket);
+        // have at least 1 KiB free space before recv
+        if (buffer_.remaining() < 1024) {
+          buffer_.expand(buffer_.size() + 1024);
+        }
+
+        recv_size = client_socket_.recv(buffer_);
+        // std::cout << "recv " << recv_size << " bytes" << std::endl;
+      } while (recv_size > 0);
+
+      if (buffer_.size() > 0) {
+        if (data_handler_lite_ != nullptr) {
+          data_handler_lite_(buffer_);
+        } else {
+          data_handler_(buffer_, client_socket_);
+        }
+      } else if (recv_size == 0) {
+        poller_.remove(poller_.events[event_index_].data.fd);
+        close(poller_.events[event_index_].data.fd);
       }
-    } else if (recv_size == 0) {
-      poller.remove(poller.events[event_index].data.fd);
-      close(poller.events[event_index].data.fd);
     }
-  }
 
-  void Server::listen(int port) {
-    server_socket.listen(port);
-  }
+    void server::listen(int port) {
+      server_socket_.listen(port);
+    }
 
-  void Server::on_data(data_handler_t handler) {
-    data_handler = handler;
-  }
+    void server::on_data(data_handler_t handler) {
+      data_handler_ = handler;
+    }
 
-  void Server::on_data(data_handler_lite_t handler) {
-    data_handler_lite = handler;
+    void server::on_data(data_handler_lite_t handler) {
+      data_handler_lite_ = handler;
+    }
+
   }
 
 }

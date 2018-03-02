@@ -5,14 +5,16 @@
 #include <warp/cluster> // cluster
 #include <warp/net> // tcp
 
+using namespace warp;
+
 void start_server() {
-  auto server = tcp::Server{};
+  auto server = tcp::server{};
 
   // TODO make this a read only buffer
   server.on_data([](auto& buffer, auto& socket){
 
     /**
-     * Buffer buffer <warp/core>
+     * buffer buffer <warp/core>
      * =============
      * 
      *  Methods:
@@ -20,7 +22,7 @@ void start_server() {
      *   - Buffer{int capacity}
      *   - clear()
      * 
-     * tcp::Socket socket <warp/net>
+     * tcp::socket socket <warp/net>
      * ==================
      * 
      *  Methods:
@@ -39,7 +41,7 @@ void start_server() {
   console::log("Listening on port " + std::to_string(port));
   
   // nothing happens unless we start the event loop
-  auto event_loop = event::Loop{};
+  auto event_loop = event::loop{};
   event_loop.add(server);
   event_loop.start();
 }

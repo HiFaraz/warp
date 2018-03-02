@@ -4,15 +4,19 @@
 #include <cstdlib> // std::getenv
 #include <string> // std::stoi
 
-namespace env {
+namespace warp {
 
-  int get_int(char const* name, int fallback) {
-    auto value = std::getenv(name);
-    if (value != nullptr) {
-      return std::stoi(value);
-    } else {
-      return fallback;
+  namespace env {
+
+    int get_int(char const* name, int fallback) {
+      auto value = std::getenv(name);
+      if (value != nullptr) {
+        return std::stoi(value);
+      } else {
+        return fallback;
+      }
     }
+
   }
 
 }

@@ -4,60 +4,64 @@
 #include <functional> // std::function
 #include <vector> // std::vector
 
-namespace event {
+namespace warp {
 
-  using poll_callback_t = std::function<void()>;
+  namespace event {
 
-  class Loop {
-    
-    public:
-      template <class T>
-      void add(T& event_provider);
+    using poll_callback_t = std::function<void()>;
 
-      void push_poll(poll_callback_t cb);
+    class loop {
+      
+      public:
+        template <class T>
+        void add(T& event_provider);
 
-      void start();
+        void push_poll(poll_callback_t cb);
 
-      void stop();
-    
-    private:
-      bool                         running = false;
-      std::vector<poll_callback_t> polls;
+        void start();
 
-      void loop();
+        void stop();
+      
+      private:
+        bool                         running_ = false;
+        std::vector<poll_callback_t> polls_;
 
-      void run_polls();
-  };
+        void launch_();
 
-  template <class T>
-  void Loop::add(T& event_provider) {
-    this->push_poll(event_provider.poll_and_process);
-  }
+        void run_polls_();
+    };
 
-  void Loop::loop() {
-    while(running) {
-      run_polls();
+    template <class T>
+    void loop::add(T& event_provider) {
+      this->push_poll(event_provider.poll_and_process_);
+    }
+
+    void loop::launch_() {
+      while(running_) {
+        run_polls_();
+      }
+    }
+
+    void loop::push_poll(poll_callback_t cb) {
+      polls_.push_back(cb);
+    }
+
+    void loop::run_polls_() {
+      for(auto& cb : polls_) {
+        cb();
+      }
+    }
+
+    void loop::start() {
+      running_ = true;
+      launch_();
+    }
+
+    void loop::stop() {
+      running_ = false;
     }
   }
 
-  void Loop::push_poll(poll_callback_t cb) {
-    polls.push_back(cb);
-  }
-
-  void Loop::run_polls() {
-    for(auto& cb : polls) {
-      cb();
-    }
-  }
-
-  void Loop::start() {
-    running = true;
-    loop();
-  }
-
-  void Loop::stop() {
-    running = false;
-  }
 }
 
 #endif // !WARP_EVENT_LOOP_H

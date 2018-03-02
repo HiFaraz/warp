@@ -18,75 +18,79 @@
 
 constexpr int BLOCKING_TIMEOUT = -1;
 
-namespace net {
-  
-  class Poller {
+namespace warp {
 
-    public:
-      struct epoll_event *  events;
-      
-      Poller(int max_events, int timeout = BLOCKING_TIMEOUT)
-        : max_events(max_events), timeout(timeout) {
-        poller_fd = epoll_create1(0);
+  namespace net {
+    
+    class poller {
 
-        if(poller_fd == -1) {
-          throw std::runtime_error{"Poller failed to create its file descriptor"};
-        }
+      public:
+        struct epoll_event *  events;
+        
+        poller(int max_events, int timeout = BLOCKING_TIMEOUT)
+          : max_events(max_events), timeout(timeout) {
+          poller_fd = epoll_create1(0);
 
-        events = new (std::nothrow) struct epoll_event[max_events];
-        if (events == nullptr) {
-          throw std::runtime_error{"Poller failed to allocate memory for its events array"};
-        }
-      };
-      ~Poller();
+          if(poller_fd == -1) {
+            throw std::runtime_error{"Poller failed to create its file descriptor"};
+          }
 
-      void add(int fd);
-      void close();
-      void remove(int fd);
-      auto wait();
+          events = new (std::nothrow) struct epoll_event[max_events];
+          if (events == nullptr) {
+            throw std::runtime_error{"Poller failed to allocate memory for its events array"};
+          }
+        };
+        ~poller();
 
-    private:
-      int poller_fd;
-      int max_events;
-      int timeout;
-  };
+        void add(int fd);
+        void close();
+        void remove(int fd);
+        auto wait();
 
-  Poller::~Poller() {
-    close();
-  }
+      private:
+        int poller_fd;
+        int max_events;
+        int timeout;
+    };
 
-  void Poller::add(int fd) {
-    struct epoll_event event;
-    event.data.fd = fd;
-    event.events = EPOLLIN|EPOLLET;
-    bool err = epoll_ctl(poller_fd, EPOLL_CTL_ADD, fd, &event) == -1;
-    if (err) {
+    poller::~poller() {
       close();
-      throw std::runtime_error{"Poller failed to add a file descriptor to epoll"};
     }
-  }
 
-  void Poller::close() {
-    int err = ::close(poller_fd) == -1;
-    if (err) {
-      throw std::runtime_error{"Poller failed to close its file descriptor"};
+    void poller::add(int fd) {
+      struct epoll_event event;
+      event.data.fd = fd;
+      event.events = EPOLLIN|EPOLLET;
+      bool err = epoll_ctl(poller_fd, EPOLL_CTL_ADD, fd, &event) == -1;
+      if (err) {
+        close();
+        throw std::runtime_error{"Poller failed to add a file descriptor to epoll"};
+      }
     }
-  }
 
-  void Poller::remove(int fd) {
-    bool err = epoll_ctl(poller_fd, EPOLL_CTL_DEL, fd, nullptr) == -1;
-    if (err) {
-      close();
-      throw std::runtime_error{"Poller failed to remove a file descriptor to epoll"};
+    void poller::close() {
+      int err = ::close(poller_fd) == -1;
+      if (err) {
+        throw std::runtime_error{"Poller failed to close its file descriptor"};
+      }
     }
-  }
 
-  auto Poller::wait() {
-    auto count = epoll_wait(poller_fd, events, max_events, timeout);
-    if (count == -1) {
-      throw std::runtime_error{"Poller failed to wait for an I/O event"};
+    void poller::remove(int fd) {
+      bool err = epoll_ctl(poller_fd, EPOLL_CTL_DEL, fd, nullptr) == -1;
+      if (err) {
+        close();
+        throw std::runtime_error{"Poller failed to remove a file descriptor to epoll"};
+      }
     }
-    return count;
+
+    auto poller::wait() {
+      auto count = epoll_wait(poller_fd, events, max_events, timeout);
+      if (count == -1) {
+        throw std::runtime_error{"Poller failed to wait for an I/O event"};
+      }
+      return count;
+    }
+
   }
 
 }

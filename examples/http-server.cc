@@ -5,13 +5,15 @@
 #include <warp/cluster> // cluster
 #include <warp/net> // http
 
+using namespace warp;
+
 void start_server() {
-  auto server = http::Server{};
+  auto server = http::server{};
 
   server.on_request([](auto& buffer, auto& res) -> void {
 
     /**
-     * http:Request req <warp/net>
+     * http:request req <warp/net>
      * ================
      * 
      *  Properties:
@@ -29,7 +31,7 @@ void start_server() {
      *   - parse_ip()
      *   - parse_query()
      * 
-     * http::Response res <warp/net>
+     * http::response res <warp/net>
      * ==================
      * 
      *  Methods:
@@ -41,7 +43,7 @@ void start_server() {
      *   - write(T input)
      *   - operator<< (T input)
      */
-    console::log(buffer.to_string());
+    // console::log(buffer.to_string());
     res << "Hello HTTP!";
   });
 
@@ -51,7 +53,7 @@ void start_server() {
   console::log("Listening on port " + std::to_string(port));
   
   // nothing happens unless we start the event loop
-  auto event_loop = event::Loop{};
+  auto event_loop = warp::event::loop{};
   event_loop.add(server);
   event_loop.start();
 }
