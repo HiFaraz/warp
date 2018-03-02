@@ -1,1 +1,1 @@
-web: ./bin/warp-http
+web: make http && ./bin/warp-http
