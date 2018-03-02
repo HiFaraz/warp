@@ -11,23 +11,23 @@
 
 namespace warp {
 
-  class const_buffer {
+  class slice_buffer {
 
     public:
       char const * const  data_;
       std::size_t         size_;
 
-      const_buffer(const char * const data, std::size_t size)
+      slice_buffer(const char * const data, std::size_t size)
        : data_(data), size_(size) {}
       auto slice(std::size_t from, std::size_t to) const;
       auto to_string() const;
   };
 
-  auto const_buffer::slice(std::size_t from, std::size_t to) const {
-    return const_buffer{data_ + from, to - from};
+  auto slice_buffer::slice(std::size_t from, std::size_t to) const {
+    return slice_buffer{data_ + from, to - from};
   }
 
-  auto const_buffer::to_string() const {
+  auto slice_buffer::to_string() const {
     return std::string(data_, size_);
   }
 
@@ -41,21 +41,28 @@ namespace warp {
         clear();
       };
 
-      void append(const char* input, int num_bytes = -1);
+      // modify the buffer
+      void append(const char* input);
       void append(const std::string input);
-      auto capacity() const;
       void clear();
-      auto cursor(); // get pointer to end of data
-      auto data();
+      void expand(std::size_t new_capacity);
       void resize(std::size_t new_size);
+
+      // inspect the buffer
+      auto begin();
+      auto capacity() const;
+      auto end();
+      auto remaining() const;
       auto size() const;
-      auto slice(std::size_t from, std::size_t to) const;
       auto to_string() const;
+
+      // extract from the buffer
+      auto slice(std::size_t from, std::size_t to) const;
 
       void inspect() const;
 
     private:
-      buffer_t data_;
+      buffer_t    data_;
       std::size_t size_ = 0;
   };
 
@@ -64,39 +71,35 @@ namespace warp {
   }
 
   void source_buffer::clear() {
-    // data_.clear();
-    size_ = 0;
+    resize(0);
   }
 
-  auto source_buffer::data() {
+  auto source_buffer::begin() {
     return data_.data();
-    // return &data_[0];
   }
 
   auto source_buffer::size() const {
-    // return data_.size();
     return size_;
   }
 
-  auto source_buffer::cursor() {
-    return data() + size_;
+  auto source_buffer::end() {
+    return begin() + size_;
   }
 
   auto source_buffer::slice(std::size_t from, std::size_t to) const {
-    return const_buffer{&data_[0] + from, to - from};
+    return slice_buffer{&data_[0] + from, to - from};
   }
 
   auto source_buffer::to_string() const {
     return std::string(data_.data(), size());
   }
 
-  void source_buffer::append(const char* input, int num_bytes) {
-    auto input_size = num_bytes == -1 ? std::strlen(input) : num_bytes;
-    auto free_space = capacity() - size();
-    if (free_space < input_size) {
+  void source_buffer::append(const char* input) {
+    auto input_size = std::strlen(input);
+    if (size() + input_size > capacity()) {
       data_.reserve(size() + input_size);
     }
-    auto pos = cursor();
+    auto pos = end();
     resize(size() + input_size);
     std::copy_n(input, input_size, pos);
   }
@@ -105,8 +108,19 @@ namespace warp {
     append(input.c_str());
   }
 
+  void source_buffer::expand(std::size_t new_capacity) {
+    if (new_capacity > capacity()) {
+      data_.reserve(new_capacity);
+    }
+  }
+
+  auto source_buffer::remaining() const {
+    return capacity() - size();
+  }
+
   void source_buffer::resize(std::size_t new_size) {
     size_ = new_size;
+    expand(size_);
   }
 
   void source_buffer::inspect() const {

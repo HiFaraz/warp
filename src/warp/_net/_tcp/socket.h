@@ -127,7 +127,7 @@ namespace tcp {
   }
 
   auto Socket::recv(Buffer& buffer) {
-    return ::recv(fd, buffer.data(), buffer.capacity() - buffer.size(), 0);
+    return ::recv(fd, buffer.end(), buffer.remaining(), 0);
   }
 
   auto Socket::send(const char* message) {
@@ -135,7 +135,7 @@ namespace tcp {
   }
 
   auto Socket::send(Buffer& buffer) {
-    return ::send(fd, buffer.data(), buffer.size(), 0);
+    return ::send(fd, buffer.begin(), buffer.size(), 0);
   }
 
   auto Socket::send(std::string message) {

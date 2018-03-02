@@ -76,7 +76,7 @@ namespace http {
       + "Content-Length: " + std::to_string(body.size()) + new_ln()
       + headers.to_string()
       + new_ln()
-      + body.data() // consider size!
+      + body.begin() // consider size!
     ) == -1;
     
     // TODO check that full buffer was sent
