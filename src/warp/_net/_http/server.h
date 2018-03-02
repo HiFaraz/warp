@@ -10,12 +10,12 @@ namespace warp {
 
   namespace http {
 
-    using request_handler_t = std::function<void(source_buffer&, response&)>;
+    using request_handler_t = std::function<void(request&, response&)>;
 
     class server : public tcp::server {
 
       public:
-        using warp::tcp::server::listen;
+        using tcp::server::listen;
         
         server() {
           on_data(handle_data_);
@@ -32,7 +32,8 @@ namespace warp {
         friend class response;
 
         tcp::data_handler_lite_t handle_data_ = [this](source_buffer& buffer) -> void {
-          request_handler_(buffer, response_);
+          request_.parse_(buffer);
+          request_handler_(request_, response_);
           response_.flush_buffer_to_(client_socket_);
           response_.reset_();
         };

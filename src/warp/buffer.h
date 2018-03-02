@@ -14,13 +14,14 @@ namespace warp {
   class slice_buffer {
 
     public:
-      char const * const  data_;
-      std::size_t         size_;
-
-      slice_buffer(const char * const data, std::size_t size)
+      slice_buffer() {}
+      slice_buffer(char const * data, std::size_t size)
        : data_(data), size_(size) {}
       auto slice(std::size_t from, std::size_t to) const;
       auto to_string() const;
+
+      char const * data_;
+      std::size_t   size_;
   };
 
   auto slice_buffer::slice(std::size_t from, std::size_t to) const {

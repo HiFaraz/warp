@@ -10,7 +10,7 @@ using namespace warp;
 void start_server() {
   auto server = http::server{};
 
-  server.on_request([](auto& buffer, auto& res) -> void {
+  server.on_request([](auto& req, auto& res) -> void {
 
     /**
      * http:request req <warp/net>
@@ -18,18 +18,9 @@ void start_server() {
      * 
      *  Properties:
      *  
-     *   - Buffer         body
-     *   - Buffer         buffer
-     *   - unordered_map  headers
-     *   - ???            ip
+     *   - http::header[] headers
      *   - string         method
-     *   - unordered_map  query
      *   - string         url
-     *  
-     *  Methods:
-     *   - parse_headers()
-     *   - parse_ip()
-     *   - parse_query()
      * 
      * http::response res <warp/net>
      * ==================
@@ -38,13 +29,17 @@ void start_server() {
      *   - end() | end(T input)
      *   - is_sent()
      *   - is_writable()
-     *   - set([std::string|const char*] header_name, [std::string|const char*] value)
-     *   - http::Status status
+     *   - set(""header_name, ""value)
+     *   - http::status status
      *   - write(T input)
      *   - operator<< (T input)
      */
-    // console::log(buffer.to_string());
-    res << "Hello HTTP!";
+    if (req.method == "GET" && req.url == "/") {
+      res.set("Content-Type", "text/plain");
+      res << "Hello HTTP!";
+    } else {
+      res.status = http::NOT_FOUND;
+    }
   });
 
   auto port = env::get_int("PORT", 8080);
@@ -53,7 +48,7 @@ void start_server() {
   console::log("Listening on port " + std::to_string(port));
   
   // nothing happens unless we start the event loop
-  auto event_loop = warp::event::loop{};
+  auto event_loop = event::loop{};
   event_loop.add(server);
   event_loop.start();
 }

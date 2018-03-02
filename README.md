@@ -1,6 +1,6 @@
 # Warp
 
-- C++ web server framework
+- C++ TCP/HTTP server framework
 - Fast (95k-105k rps for Hello World)
 - Header only
 - Linux only
@@ -11,7 +11,34 @@ How:
 - Polling with epoll
 - Threads
 
-The "Hello world" example barely uses any memory and supports at least 1,000 connections.
+```
+#include <warp/core> // event
+#include <warp/net> // http
+
+using namespace warp;
+
+int main() {
+  auto server = http::server{};
+
+  server.on_request([](auto& req, auto& res) -> {
+    if (req.method == "GET" && req.url == "/") {
+      res.set("Content-Type", "text/plain");
+      res << "Hello HTTP!";
+    } else {
+      res.status = http::NOT_FOUND;
+    }
+  });
+
+  server.listen(8080);
+  
+  // nothing happens unless we start the event loop
+  auto event_loop = event::loop{};
+  event_loop.add(server);
+  event_loop.start();
+}
+```
+
+The "Hello world" example barely uses any memory and supports at least 1,000 connections on my small laptop.
 
 ## Including Warp in your project
 
@@ -22,6 +49,8 @@ Including Warp is easy because it's a header-only library. Here are the steps:
 ```
 $ make
 ```
+
+(Internet connection required to download dependencies)
 
 2. Copy `include/*` to your include path (wherever you like).
 
