@@ -16,7 +16,7 @@ namespace warp {
     class response {
 
       public:
-        struct status status = OK;
+        char const * status = OK;
 
         void end();
 
@@ -24,7 +24,7 @@ namespace warp {
         void end(T input);
         auto is_sent() const;
         auto is_writable() const;
-        void set(std::string header_name, std::string value);
+        void set(char const * header_name, char const * value);
 
         template <typename T>
         void write(T input);
@@ -37,10 +37,10 @@ namespace warp {
 
         source_buffer body_{BUFSIZ};
         source_buffer headers_{HTTP_MAX_HEADER_SIZE()};
+        source_buffer full_response_{BUFSIZ};
         bool          sent_ = false;
         bool          writable_ = true;
 
-        auto get_status_line_(std::string http_version = "HTTP/1.1") const;
         void flush_buffer_to_(tcp::socket&);
         void reset_();
     };
@@ -55,10 +55,6 @@ namespace warp {
       end();
     }
 
-    auto response::get_status_line_(std::string http_version) const {
-      return http_version + " " + std::to_string(this->status.code) + " " + this->status.description;
-    }
-
     void response::flush_buffer_to_(tcp::socket& socket) {
       // safe to call this function multiple times, because
       // if exits if we have already had a successful send
@@ -71,13 +67,17 @@ namespace warp {
       // send whatever we have to the socket
       // assume no chunked transfers for now, only one short
       // therefore we can send the headers unconditionally
-      auto err = socket.send(
-        std::string{get_status_line_()} + new_ln()
-        + "Content-Length: " + std::to_string(body_.size()) + new_ln()
-        + headers_.to_string()
-        + new_ln()
-        + body_.begin() // consider size!
-      ) == -1;
+      // full_response_ is used because:
+      // - calling socket.send multiple times is 4x slow
+      // - concatenating everything into an std::string was also slow, and also it didn't account for header_ and body_ size
+      full_response_.clear();
+      full_response_.append(status);
+      full_response_.append("Content-Length: " + std::to_string(body_.size()));
+      full_response_.append(new_ln());
+      full_response_.append(headers_);
+      full_response_.append(new_ln());
+      full_response_.append(body_);
+      auto err = socket.send(full_response_) == -1;
       
       // TODO check that full buffer was sent
 
@@ -98,12 +98,15 @@ namespace warp {
       body_.clear();
       headers_.clear();
       sent_ = false;
-      this->status = OK;
+      status = OK;
       writable_ = true;
     }
 
-    void response::set(std::string header_name, std::string value) {
-      headers_.append(header_name + ": " + value + new_ln());
+    void response::set(char const * header_name, char const * value) {
+      headers_.append(header_name);
+      headers_.append(": ");
+      headers_.append(value);
+      headers_.append(new_ln());
     }
 
     template <typename T>

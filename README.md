@@ -1,7 +1,7 @@
 # Warp
 
 - C++ TCP/HTTP server framework
-- Fast (95k-105k rps for Hello World)
+- Fast (92k-105k rps for Hello World)
 - Header only
 - Linux only
 
@@ -11,7 +11,7 @@ How:
 - Polling with epoll
 - Threads
 
-```
+```c++
 #include <warp/core> // event
 #include <warp/net> // http
 
@@ -46,7 +46,7 @@ Including Warp is easy because it's a header-only library. Here are the steps:
 
 1. Build the project
 
-```
+```sh
 $ make
 ```
 
@@ -60,19 +60,19 @@ $ make
 
 Compile the examples:
 
-```
+```sh
 $ make examples
 ```
 
 Run the examples:
 
-```
+```sh
 $ bin/warp-tcp
 ```
 
 OR
 
-```
+```sh
 $ bin/warp-http
 ```
 
@@ -80,7 +80,7 @@ $ bin/warp-http
 
 The following micro-benchmarks can be run:
 
-```
+```sh
 bench/warp tcp
 bench/warp http
 ```

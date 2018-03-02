@@ -43,8 +43,9 @@ namespace warp {
       };
 
       // modify the buffer
-      void append(const char* input);
+      void append(const char* input, std::size_t length = -1);
       void append(const std::string input);
+      void append(source_buffer& buffer);
       void clear();
       void expand(std::size_t new_capacity);
       void resize(std::size_t new_size);
@@ -95,8 +96,8 @@ namespace warp {
     return std::string(data_.data(), size());
   }
 
-  void source_buffer::append(const char* input) {
-    auto input_size = std::strlen(input);
+  void source_buffer::append(const char* input, std::size_t length) {
+    auto input_size = length == -1 ? std::strlen(input) : length;
     if (size() + input_size > capacity()) {
       data_.reserve(size() + input_size);
     }
@@ -107,6 +108,10 @@ namespace warp {
 
   void source_buffer::append(const std::string input) {
     append(input.c_str());
+  }
+
+  void source_buffer::append(source_buffer& buffer) {
+    append(buffer.begin(), buffer.size());
   }
 
   void source_buffer::expand(std::size_t new_capacity) {
