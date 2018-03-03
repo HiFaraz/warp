@@ -1,6 +1,7 @@
 #ifndef WARP_NET_TCP_SOCKET_H
 #define WARP_NET_TCP_SOCKET_H
 
+#include <cstddef> // std::size_t
 #include <cstring> // memset
 #include <string> // std::string
 #include <stdexcept>
@@ -72,6 +73,7 @@ namespace warp {
 
         auto recv(source_buffer& buffer);
         auto send(const char* message);
+        auto send(const char* message, std::size_t length);
         auto send(source_buffer& buffer);
         auto send(std::string message);
         void set_fd(int socket_fd);
@@ -129,12 +131,16 @@ namespace warp {
       return ::recv(fd_, buffer.end(), buffer.remaining(), 0);
     }
 
+    auto socket::send(const char* message, std::size_t length) {
+      return ::send(fd_, message, length, 0);
+    }
+
     auto socket::send(const char* message) {
-      return ::send(fd_, message, strlen(message), 0);
+      return send(message, strlen(message));
     }
 
     auto socket::send(source_buffer& buffer) {
-      return ::send(fd_, buffer.begin(), buffer.size(), 0);
+      return send(buffer.begin(), buffer.size());
     }
 
     auto socket::send(std::string message) {

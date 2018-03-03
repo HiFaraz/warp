@@ -11,6 +11,17 @@
 
 namespace warp {
 
+  struct char_string {
+    char const * message;
+    std::size_t length;
+    auto begin() const {
+      return message;
+    }
+    auto size() const {
+      return length;
+    }
+  };
+
   class slice_buffer {
 
     public:
@@ -43,9 +54,11 @@ namespace warp {
       };
 
       // modify the buffer
-      void append(const char* input, std::size_t length = -1);
-      void append(const std::string input);
-      void append(source_buffer& buffer);
+      void append(const char* value);
+      void append(const char* value, std::size_t length);
+      void append(const std::string value);
+      template <typename T>
+      void append(T& value);
       void clear();
       void expand(std::size_t new_capacity);
       void resize(std::size_t new_size);
@@ -96,22 +109,26 @@ namespace warp {
     return std::string(data_.data(), size());
   }
 
-  void source_buffer::append(const char* input, std::size_t length) {
-    auto input_size = length == -1 ? std::strlen(input) : length;
-    if (size() + input_size > capacity()) {
-      data_.reserve(size() + input_size);
+  void source_buffer::append(const char* value) {
+    append(value, strlen(value));
+  }
+
+  void source_buffer::append(const char* value, std::size_t length) {
+    if (size() + length > capacity()) {
+      data_.reserve(size() + length);
     }
     auto pos = end();
-    resize(size() + input_size);
-    std::copy_n(input, input_size, pos);
+    resize(size() + length);
+    std::copy_n(value, length, pos);
   }
 
-  void source_buffer::append(const std::string input) {
-    append(input.c_str());
+  void source_buffer::append(const std::string value) {
+    append(value.c_str(), value.length());
   }
 
-  void source_buffer::append(source_buffer& buffer) {
-    append(buffer.begin(), buffer.size());
+  template <typename T>
+  void source_buffer::append(T& value) {
+    append(value.begin(), value.size());
   }
 
   void source_buffer::expand(std::size_t new_capacity) {

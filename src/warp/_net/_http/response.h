@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <string> // std::to_string
 
-#include "warp/buffer.h" // Buffer
+#include "warp/buffer.h" // char_string, source_buffer
 #include "warp/_net/_http/message.h" // HTTP_MAX_HEADER_SIZE, new_ln
 #include "warp/_net/_http/status.h" // status
 #include "warp/_net/_tcp/socket.h" // tcp::socket
@@ -16,7 +16,7 @@ namespace warp {
     class response {
 
       public:
-        char const * status = OK;
+        struct char_string status = OK;
 
         void end();
 
@@ -25,7 +25,8 @@ namespace warp {
         auto is_sent() const;
         auto is_writable() const;
         void set(char const * header_name, char const * value);
-
+        void write(char const * value, std::size_t length);
+        void write(std::string value);
         template <typename T>
         void write(T input);
 
@@ -67,15 +68,19 @@ namespace warp {
       // send whatever we have to the socket
       // assume no chunked transfers for now, only one short
       // therefore we can send the headers unconditionally
+
       // full_response_ is used because:
       // - calling socket.send multiple times is 4x slow
-      // - concatenating everything into an std::string was also slow, and also it didn't account for header_ and body_ size
+      // - concatenating everything into an std::string was also slow,
+      // and also it didn't account for header_ and body_ size
       full_response_.clear();
+      full_response_.append("HTTP/1.1 ", 9);
       full_response_.append(status);
-      full_response_.append("Content-Length: " + std::to_string(body_.size()));
-      full_response_.append(new_ln());
+      full_response_.append("Content-Length: ", 16);
+      full_response_.append(std::to_string(body_.size()));
+      full_response_.append(new_ln(), 2);
       full_response_.append(headers_);
-      full_response_.append(new_ln());
+      full_response_.append(new_ln(), 2);
       full_response_.append(body_);
       auto err = socket.send(full_response_) == -1;
       
@@ -103,14 +108,30 @@ namespace warp {
     }
 
     void response::set(char const * header_name, char const * value) {
-      headers_.append(header_name);
-      headers_.append(": ");
-      headers_.append(value);
-      headers_.append(new_ln());
+      headers_.append(header_name, strlen(header_name));
+      headers_.append(": ", 2);
+      headers_.append(value, strlen(value));
+      headers_.append(new_ln(), 2);
+    }
+
+    void response::write(char const * value, std::size_t length) {
+      if (writable_) {
+        body_.append(value, length);
+      } else {
+        throw std::runtime_error{"Cannot write to closed HTTP response stream"};
+      }
+    }
+
+    void response::write(std::string value) {
+      if (writable_) {
+        body_.append(value);
+      } else {
+        throw std::runtime_error{"Cannot write to closed HTTP response stream"};
+      }
     }
 
     template <typename T>
-    void response::write(T input) {
+    void response::write(T input) { // for char const * inputs mostly
       if (writable_) {
         body_.append(input);
       } else {
