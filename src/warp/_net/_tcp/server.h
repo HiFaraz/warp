@@ -3,6 +3,7 @@
 
 #include <iostream> // std::cout, std::endl
 #include <functional> // std::function
+#include <string> // std::stoi
 
 #include "warp/buffer.h" // source_buffer
 #include "warp/_event/loop.h" // event::poll_callback_t
@@ -25,6 +26,7 @@ namespace warp {
         ~server();
 
         void listen(int port);
+        void listen(char const * port);
         void on_data(data_handler_t handler);
         void on_data(data_handler_lite_t handler);
 
@@ -103,6 +105,10 @@ namespace warp {
         poller_.remove(poller_.events[event_index_].data.fd);
         close(poller_.events[event_index_].data.fd);
       }
+    }
+
+    void server::listen(char const * port) {
+      listen(std::stoi(port));
     }
 
     void server::listen(int port) {
