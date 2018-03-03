@@ -9,7 +9,7 @@ TESTS := tests
 
 # Compiler
 CC := g++
-CFLAGS := -std=c++14 -O2 -I $(INCLUDE) -pthread
+CFLAGS := -std=c++14 -O3 -I $(INCLUDE) -pthread
 LFLAGS := -L $(LIB) -lpicohttpparser
 
 all: warp
