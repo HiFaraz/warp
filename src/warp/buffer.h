@@ -114,11 +114,12 @@ namespace warp {
   }
 
   void source_buffer::append(const char* value, std::size_t length) {
-    if (size() + length > capacity()) {
-      data_.reserve(size() + length);
+    std::size_t new_size = size() + length;
+    if (new_size > capacity()) {
+      data_.reserve(new_size);
     }
     auto pos = end();
-    resize(size() + length);
+    resize(new_size);
     std::copy_n(value, length, pos);
   }
 
